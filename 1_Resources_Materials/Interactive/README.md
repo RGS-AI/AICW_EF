@@ -8,7 +8,7 @@ Simply click on any topic below to launch the interactive resource in your brows
 
 ---
 
-## 🚀 Interactive Modules
+## Interactive Modules
 
 | Topic | Description | Access |
 |-------|-------------|--------|
