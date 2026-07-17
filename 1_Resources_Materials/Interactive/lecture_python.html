@@ -1,0 +1,2073 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Basics for Data Science — Interactive Lecture</title>
+<script>
+(function(){try{var t=localStorage.getItem('lecTheme');
+if(t==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}})();
+</script>
+<style>
+:root{
+  --bg:#070b16;--bg2:#0b1120;--panel:#0e1729;--panel2:#121d36;--line:#1f2d4d;
+  --ink:#e7edf9;--muted:#93a4c8;--dim:#64759c;
+  --cyan:#38f0d8;--cyan2:#19c4ff;--violet:#9b8cff;--pink:#ff6ec7;
+  --amber:#ffcb6b;--green:#62e88a;--red:#ff6b81;
+  --glow:0 0 18px rgba(56,240,216,.45);--r:16px;
+  --mono:'SFMono-Regular',ui-monospace,'JetBrains Mono',Menlo,Consolas,monospace;
+}
+[data-theme="light"]{
+  --bg:#f4f6fb;--bg2:#eaeff7;--panel:#fff;--panel2:#f0f4fb;--line:#c8d4e8;
+  --ink:#1a2340;--muted:#4a5f80;--dim:#7a8faa;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{overflow-x:hidden;scroll-behavior:smooth;}
+body{
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:var(--bg);color:var(--ink);line-height:1.65;
+  display:grid;grid-template-columns:288px 1fr;min-height:100vh;
+}
+/* ── PROGRESS ── */
+.progress{position:fixed;top:0;left:0;right:0;height:3px;background:var(--line);z-index:200;}
+#progbar{height:100%;width:0%;background:linear-gradient(90deg,var(--cyan),var(--violet));transition:width .1s;}
+/* ── SIDEBAR ── */
+.sidebar{
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+  background:var(--bg2);border-right:1px solid var(--line);
+  padding:20px 0 40px;display:flex;flex-direction:column;gap:2px;
+}
+.sidebar-head{padding:0 20px 16px;font-size:.75rem;font-weight:700;letter-spacing:.12em;color:var(--dim);text-transform:uppercase;}
+.toc a{
+  display:flex;align-items:center;gap:10px;padding:7px 20px;
+  color:var(--muted);text-decoration:none;font-size:.82rem;
+  border-left:3px solid transparent;transition:all .15s;
+}
+.toc a:hover{color:var(--ink);background:var(--panel);}
+.toc a.active{color:var(--cyan);border-left-color:var(--cyan);background:var(--panel);}
+.toc .n{font-family:var(--mono);font-size:.7rem;color:var(--dim);min-width:22px;}
+.grp{padding:12px 20px 4px;font-size:.68rem;font-weight:700;letter-spacing:.1em;color:var(--dim);text-transform:uppercase;}
+/* ── MAIN ── */
+main{padding:48px 56px 120px;max-width:880px;}
+section{padding:60px 0;border-bottom:1px solid var(--line);}
+section:last-child{border-bottom:none;}
+.kicker{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;color:var(--cyan);text-transform:uppercase;margin-bottom:10px;}
+h2{font-size:2rem;font-weight:800;line-height:1.2;margin-bottom:14px;}
+h3{font-size:1.15rem;font-weight:700;margin:28px 0 10px;color:var(--cyan2);}
+h4{font-size:.95rem;font-weight:700;margin:16px 0 8px;color:var(--amber);}
+p{margin-bottom:14px;overflow-wrap:anywhere;}
+p.lead{font-size:1.1rem;color:var(--muted);margin-bottom:20px;}
+/* ── COMPONENTS ── */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px 24px;margin:16px 0;}
+.note{background:var(--panel);border-left:4px solid var(--violet);border-radius:0 var(--r) var(--r) 0;padding:16px 20px;margin:16px 0;}
+.key{background:var(--panel);border-left:4px solid var(--amber);border-radius:0 var(--r) var(--r) 0;padding:16px 20px;margin:16px 0;}
+.lab{background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);padding:22px 24px;margin:20px 0;position:relative;}
+.lab::before{content:'⚡ INTERACTIVE';position:absolute;top:-1px;left:24px;transform:translateY(-50%);background:var(--cyan);color:#070b16;font-family:var(--mono);font-size:.62rem;font-weight:800;letter-spacing:.12em;padding:2px 10px;border-radius:999px;}
+.eqbox{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 20px;overflow-x:auto;margin:12px 0;}
+.eqbox mjx-container[display="true"]{overflow-x:auto;max-width:100%;}
+mjx-container[display="true"]{overflow-x:auto;max-width:100%;}
+.readout{font-family:var(--mono);font-size:.78rem;background:#040810;border:1px solid var(--line);border-radius:10px;padding:14px 16px;white-space:pre-wrap;overflow-wrap:anywhere;min-height:60px;margin-top:12px;line-height:1.7;}
+.hl{color:var(--amber);}
+.g{color:var(--green);}
+.er{color:var(--red);}
+.ctrl{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:8px 0;}
+.ctrl label{font-size:.8rem;color:var(--muted);min-width:100px;}
+.ctrl input[type=range]{-webkit-appearance:none;appearance:none;flex:1;min-width:80px;height:4px;background:var(--line);border-radius:2px;outline:none;}
+.ctrl input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:var(--cyan);box-shadow:var(--glow);cursor:pointer;}
+.ctrl .val{font-family:var(--mono);font-size:.8rem;color:var(--cyan);min-width:40px;text-align:right;}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
+.btn{
+  font-family:var(--mono);font-size:.75rem;padding:6px 14px;
+  background:var(--panel);border:1px solid var(--line);border-radius:8px;
+  color:var(--muted);cursor:pointer;transition:all .15s;
+}
+.btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.btn.active{background:var(--cyan);color:#070b16;border-color:var(--cyan);}
+.btn:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin:16px 0;}
+.muted{font-size:.8rem;color:var(--dim);margin:4px 0 10px;}
+canvas{max-width:100%;display:block;border-radius:10px;}
+/* ── TOP BUTTONS ── */
+.topbar{position:fixed;top:10px;right:16px;display:flex;gap:8px;z-index:150;}
+.topbtn{
+  font-size:.72rem;font-family:var(--mono);padding:5px 12px;
+  background:var(--panel2);border:1px solid var(--line);border-radius:999px;
+  color:var(--muted);cursor:pointer;transition:all .15s;
+}
+.topbtn:hover{border-color:var(--cyan);color:var(--cyan);}
+/* ── STORY CARD ── */
+.storycard{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:var(--panel2);border:1px solid var(--cyan);border-radius:14px;
+  padding:14px 20px;max-width:520px;width:90%;z-index:160;display:none;
+  box-shadow:0 8px 32px rgba(0,0,0,.6);
+}
+.storycard .st-title{font-family:var(--mono);font-size:.72rem;color:var(--cyan);margin-bottom:4px;}
+.storycard .st-text{font-size:.85rem;color:var(--muted);margin-bottom:12px;}
+.st-btns{display:flex;gap:8px;flex-wrap:wrap;}
+.spot-ring{
+  position:fixed;pointer-events:none;border:2px solid var(--cyan);border-radius:8px;
+  z-index:140;box-shadow:var(--glow);transition:all .3s;display:none;
+}
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto;margin:14px 0;}
+table{border-collapse:collapse;width:100%;font-size:.82rem;}
+th,td{padding:8px 12px;border:1px solid var(--line);text-align:left;word-break:break-word;}
+th{background:var(--panel2);color:var(--amber);font-weight:700;}
+/* ── CODE ── */
+pre{background:#040810;border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;font-family:var(--mono);font-size:.8rem;line-height:1.7;margin:12px 0;position:relative;}
+code{font-family:var(--mono);font-size:.85em;background:var(--panel);padding:1px 5px;border-radius:4px;}
+.copy-btn{position:absolute;top:8px;right:10px;font-size:.65rem;font-family:var(--mono);padding:3px 9px;background:var(--panel2);border:1px solid var(--line);border-radius:6px;color:var(--muted);cursor:pointer;}
+.copy-btn:hover{color:var(--cyan);}
+/* ── REVEAL ── */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .5s,transform .5s;}
+.reveal.visible{opacity:1;transform:none;}
+/* ── MOBILE ── */
+@media(max-width:880px){
+  body{grid-template-columns:1fr;}
+  .sidebar{position:relative;height:auto;border-right:none;border-bottom:1px solid var(--line);}
+  main{padding:28px 20px 80px;}
+  h2{font-size:1.5rem;}
+  .grid2,.grid3{grid-template-columns:1fr;}
+}
+@media(prefers-reduced-motion:reduce){
+  .reveal{opacity:1;transform:none;}
+  *{transition:none !important;animation:none !important;}
+}
+</style>
+</head>
+<body>
+
+<div class="progress"><i id="progbar"></i></div>
+
+<div class="topbar">
+  <button class="topbtn" id="tourBtn">▶ Guided tour</button>
+  <button class="topbtn" id="themeBtn">☀ Light</button>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-head">Python Basics for Data Science</div>
+  <nav class="toc" id="toc">
+    <div class="grp">Getting Started</div>
+    <a href="#intro"><span class="n">00</span> Overview</a>
+    <a href="#what-is-python"><span class="n">01</span> What is Python?</a>
+    <a href="#compilers"><span class="n">02</span> Compilers vs Interpreters</a>
+    <a href="#ides"><span class="n">03</span> IDEs &amp; Jupyter</a>
+
+    <div class="grp">Core Building Blocks</div>
+    <a href="#variables"><span class="n">04</span> Variables</a>
+    <a href="#datatypes"><span class="n">05</span> Data Types</a>
+    <a href="#operators"><span class="n">06</span> Operators</a>
+    <a href="#input-output"><span class="n">07</span> Input &amp; Output</a>
+    <a href="#strings"><span class="n">08</span> Strings &amp; Slicing</a>
+
+    <div class="grp">Data Structures</div>
+    <a href="#lists"><span class="n">09</span> Lists</a>
+    <a href="#tuples"><span class="n">10</span> Tuples</a>
+    <a href="#sets"><span class="n">11</span> Sets</a>
+    <a href="#dicts"><span class="n">12</span> Dictionaries</a>
+
+    <div class="grp">Control &amp; Logic</div>
+    <a href="#if-else"><span class="n">13</span> if / elif / else</a>
+    <a href="#for-loop"><span class="n">14</span> for Loops</a>
+    <a href="#while-loop"><span class="n">15</span> while &amp; break/continue</a>
+
+    <div class="grp">Putting It Together</div>
+    <a href="#functions"><span class="n">16</span> Functions</a>
+    <a href="#file-handling"><span class="n">17</span> File Handling</a>
+  </nav>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main>
+
+<!-- 00 OVERVIEW -->
+<section id="intro">
+  <div class="kicker">00 · Overview</div>
+  <h2>Python for Data Science — <em>Start Here</em></h2>
+  <p class="lead">From your very first line of code to reading and writing files — this lecture walks you through every building block of Python. Each idea builds on the last.</p>
+  <div class="note">
+    <strong>Analogy — Python as a conversation.</strong> Most languages make you write everything down, hand it to a translator (compiler), and wait. Python is different. You speak a line; Python answers immediately. It is like talking to a very patient teacher who never misunderstands your intent.
+  </div>
+  <div class="grid3">
+    <div class="card"><h4>📦 Core Building Blocks</h4><p>Variables, data types, operators, strings, and how to talk to the user.</p></div>
+    <div class="card"><h4>🗂 Data Structures</h4><p>Lists, tuples, sets, and dictionaries — four containers, four different jobs.</p></div>
+    <div class="card"><h4>⚙️ Control &amp; Logic</h4><p>if/else, for loops, while loops, functions, and file handling.</p></div>
+  </div>
+  <p>Read top-to-bottom, or jump to any chapter via the sidebar. Every ⚡ panel is live — drag sliders and click buttons to feel each idea.</p>
+</section>
+
+---
+
+<!-- 01 WHAT IS PYTHON -->
+<section id="what-is-python">
+  <div class="kicker">01 · What is Python?</div>
+  <h2>A language that just… works</h2>
+  <p class="lead">Python is an <strong>interpreted</strong>, <strong>object-oriented</strong>, <strong>high-level</strong> language. Each of those words means something specific — and together they explain why Python dominates data science.</p>
+
+  <div class="note">
+    <strong>Analogy — a Swiss Army knife.</strong> Low-level languages (like C) are like a raw kitchen knife: fast, precise, but hard to use. Python is like a Swiss Army knife: not the absolute fastest, but it has a tool for everything, and you can use it straight away.
+  </div>
+
+  <div class="grid3">
+    <div class="card">
+      <h4>Interpreted</h4>
+      <p>Python runs your code <em>one line at a time</em>, right now. You do not wait for a full translation step. Errors are found instantly.</p>
+    </div>
+    <div class="card">
+      <h4>High-level</h4>
+      <p>You write <code>print("hello")</code>, not machine instructions. Python handles memory and hardware for you.</p>
+    </div>
+    <div class="card">
+      <h4>Object-oriented</h4>
+      <p>Everything in Python is an <em>object</em> — a bundle of data and actions. Lists, strings, even numbers are objects with built-in methods.</p>
+    </div>
+  </div>
+
+  <h3>Why does it dominate data science?</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Feature</th><th>Benefit for data science</th></tr>
+      <tr><td>Readable syntax</td><td>Code reads almost like English — easy to share and maintain</td></tr>
+      <tr><td>Huge library ecosystem</td><td>NumPy, Pandas, Scikit-learn, TensorFlow — all free</td></tr>
+      <tr><td>Interactive notebooks</td><td>Run one cell, see the result, adjust, repeat</td></tr>
+      <tr><td>Community</td><td>Millions of answered questions, tutorials, and examples</td></tr>
+    </table>
+  </div>
+
+  <div class="key">
+    <strong>Key insight:</strong> Python trades raw speed for <em>developer speed</em>. For data science — where you spend most time thinking, not waiting — that trade is almost always worth it.
+  </div>
+</section>
+
+---
+
+<!-- 02 COMPILERS VS INTERPRETERS -->
+<section id="compilers">
+  <div class="kicker">02 · Compilers vs Interpreters</div>
+  <h2>Translate now or translate later?</h2>
+  <p class="lead">Your computer only understands machine code (zeros and ones). A <em>translator</em> turns your Python text into machine code. There are two ways to do that translation.</p>
+
+  <div class="note">
+    <strong>Analogy — book vs. live interpreter.</strong> A <strong>compiler</strong> is like translating an entire book before anyone reads it — slow upfront, but the translated book is fast to read. An <strong>interpreter</strong> is like a live translator in a meeting — they translate each sentence as you speak it, immediately, but they do it every time.
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Compiler (e.g. C, C++)</h4>
+      <p>Reads the <em>whole program</em> first. Produces a standalone executable. Very fast to run. Errors caught before running.</p>
+    </div>
+    <div class="card">
+      <h4>Interpreter (Python)</h4>
+      <p>Reads and runs <em>one line at a time</em>. No separate build step. Errors appear at the exact failing line, immediately.</p>
+    </div>
+  </div>
+
+  <h3>Why does this matter for learning?</h3>
+  <p>With an interpreter, you can open a Python shell, type one line, and see what happens. This tight feedback loop is one reason Python is excellent for learning and exploration.</p>
+
+  <div class="lab">
+    <h4>⚡ See the difference — how many steps to "Hello, World!"?</h4>
+    <p class="muted">Click each button to walk through the steps. Notice how many extra steps a compiled language needs.</p>
+    <div class="chips">
+      <button class="btn active" id="cmpComp">Compiled language</button>
+      <button class="btn" id="cmpInterp">Python (interpreted)</button>
+    </div>
+    <div class="readout" id="cmpOut"></div>
+  </div>
+
+  <div class="key">
+    <strong>Pitfall:</strong> Being interpreted does NOT mean Python is slow for data science. NumPy and Pandas run C code underneath — you get Python's ease with near-C speed for heavy number crunching.
+  </div>
+</section>
+
+---
+
+<!-- 03 IDEs -->
+<section id="ides">
+  <div class="kicker">03 · IDEs &amp; Jupyter</div>
+  <h2>Where you actually write code</h2>
+  <p class="lead">An <em>IDE</em> (Integrated Development Environment) bundles a code editor, a way to run code, and a debugger into one app. For data science, <strong>Jupyter Notebook</strong> inside <strong>Anaconda</strong> is the standard starting point.</p>
+
+  <div class="note">
+    <strong>Analogy — a workshop vs. a blank table.</strong> You could write code in Notepad, just as you could assemble furniture on a bare floor. An IDE gives you a proper workbench: labeled drawers, the right tools in reach, a lamp.
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Anaconda</h4>
+      <p>A free distribution that installs Python <em>plus</em> hundreds of data-science libraries (NumPy, Pandas, Matplotlib…) in one click. Download from <code>anaconda.com</code>.</p>
+    </div>
+    <div class="card">
+      <h4>Jupyter Notebook</h4>
+      <p>A web-based notebook. You write code in <em>cells</em>. Each cell runs independently. Results — numbers, charts — appear right below the cell. Perfect for exploration.</p>
+    </div>
+  </div>
+
+  <h3>The cell model — why it matters</h3>
+  <div class="lab">
+    <h4>⚡ Simulate a Jupyter notebook cell</h4>
+    <p class="muted">Type Python-like expressions and press Run. See how cells give instant feedback.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+      <input id="cellInput" type="text" placeholder='Try: 2 + 3  or  "hello" * 3  or  len("Python")'
+        style="flex:1;min-width:200px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 12px;color:var(--ink);font-family:var(--mono);font-size:.82rem;outline:none;">
+      <button class="btn active" id="cellRun">▶ Run Cell</button>
+    </div>
+    <div class="readout" id="cellOut">In [1]: _</div>
+  </div>
+
+  <div class="key">
+    <strong>Setup tip:</strong> Install Anaconda first. Then launch "Jupyter Notebook" from the Anaconda Navigator. A browser tab opens — that is your workspace. No extra installs needed.
+  </div>
+</section>
+
+---
+
+<!-- 04 VARIABLES -->
+<section id="variables">
+  <div class="kicker">04 · Variables</div>
+  <h2>Giving names to values</h2>
+  <p class="lead">A <em>variable</em> is a named box that holds a value. Give it a name, put a value in, and use the name anywhere you need the value.</p>
+
+  <div class="note">
+    <strong>Analogy — sticky labels on boxes.</strong> Imagine a warehouse of boxes. A variable is a sticky label you put on a box. The label "profit_q1" tells you what is inside without opening every box. You can swap the box's contents later — the label stays the same.
+  </div>
+
+  <h3>Creating a variable</h3>
+  <div class="eqbox">$$ \text{variable\_name} = \text{value} $$</div>
+  <p>The equals sign <code>=</code> here means <em>assignment</em> (store this value), not equality in the math sense.</p>
+
+  <pre><button class="copy-btn">copy</button>profit_q1 = 50000      # integer
+profit_q2 = 75000
+rate = 0.08            # float (decimal)
+name = "Alice"         # string (text)
+is_open = True         # boolean (True/False)</pre>
+
+  <h3>Naming rules</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Rule</th><th>Good example</th><th>Bad example</th></tr>
+      <tr><td>Letters, digits, underscores only</td><td><code>profit_q1</code></td><td><code>profit-q1</code> (dash not allowed)</td></tr>
+      <tr><td>Cannot start with a digit</td><td><code>score1</code></td><td><code>1score</code></td></tr>
+      <tr><td>Case-sensitive</td><td><code>Score</code> ≠ <code>score</code></td><td>—</td></tr>
+      <tr><td>No Python keywords</td><td><code>total</code></td><td><code>for</code>, <code>if</code>, <code>while</code></td></tr>
+    </table>
+  </div>
+
+  <div class="lab">
+    <h4>⚡ Build the profit calculator</h4>
+    <p class="muted">Slide each quarter's profit. Watch the variable assignment and total update live.</p>
+    <div class="ctrl"><label>Q1 profit (₹)</label><input type="range" id="vQ1" min="0" max="200000" step="5000" value="50000"><span class="val" id="vQ1v">50000</span></div>
+    <div class="ctrl"><label>Q2 profit (₹)</label><input type="range" id="vQ2" min="0" max="200000" step="5000" value="75000"><span class="val" id="vQ2v">75000</span></div>
+    <div class="ctrl"><label>Q3 profit (₹)</label><input type="range" id="vQ3" min="0" max="200000" step="5000" value="60000"><span class="val" id="vQ3v">60000</span></div>
+    <div class="ctrl"><label>Q4 profit (₹)</label><input type="range" id="vQ4" min="0" max="200000" step="5000" value="65000"><span class="val" id="vQ4v">65000</span></div>
+    <div class="readout" id="varOut"></div>
+  </div>
+
+  <div class="key">
+    <strong>Key insight:</strong> Python figures out the type automatically from the value you assign. You do not declare types. This is called <em>dynamic typing</em>.
+  </div>
+</section>
+
+---
+
+<!-- 05 DATA TYPES -->
+<section id="datatypes">
+  <div class="kicker">05 · Data Types</div>
+  <h2>What kind of thing is this value?</h2>
+  <p class="lead">A <em>data type</em> tells Python what kind of value a variable holds — and which operations make sense on it. You cannot divide a name by two.</p>
+
+  <div class="note">
+    <strong>Analogy — different shaped containers.</strong> A milk carton, a wallet, and a filing cabinet each hold different things. You would not pour juice into a wallet. Data types are Python's version of "different shapes for different things."
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Type</th><th>What it holds</th><th>Example</th><th>Check with</th></tr>
+      <tr><td><code>int</code></td><td>Whole numbers</td><td><code>age = 25</code></td><td><code>type(age)</code> → <code>int</code></td></tr>
+      <tr><td><code>float</code></td><td>Decimal numbers</td><td><code>bmi = 22.5</code></td><td><code>type(bmi)</code> → <code>float</code></td></tr>
+      <tr><td><code>str</code></td><td>Text (any characters)</td><td><code>name = "Alice"</code></td><td><code>type(name)</code> → <code>str</code></td></tr>
+      <tr><td><code>bool</code></td><td>True or False only</td><td><code>passed = True</code></td><td><code>type(passed)</code> → <code>bool</code></td></tr>
+      <tr><td><code>list</code></td><td>Ordered collection</td><td><code>[10, 20, 30]</code></td><td><code>type([...])</code> → <code>list</code></td></tr>
+      <tr><td><code>dict</code></td><td>Key-value pairs</td><td><code>{"name":"Ali"}</code></td><td><code>type({...})</code> → <code>dict</code></td></tr>
+    </table>
+  </div>
+
+  <div class="lab">
+    <h4>⚡ Type detector — click a value, see its type</h4>
+    <p class="muted">Press any value to see what Python's <code>type()</code> returns and why.</p>
+    <div class="chips" id="typeChips">
+      <button class="btn active" data-val="42" data-type="int" data-why="No decimal point → whole number">42</button>
+      <button class="btn" data-val="3.14" data-type="float" data-why="Has a decimal point → floating-point number">3.14</button>
+      <button class="btn" data-val='"Alice"' data-type="str" data-why="Surrounded by quotes → string (text)"><code>"Alice"</code></button>
+      <button class="btn" data-val="True" data-type="bool" data-why="Only two possible values: True or False">True</button>
+      <button class="btn" data-val="[1, 2, 3]" data-type="list" data-why="Square brackets, multiple values → list">[1,2,3]</button>
+      <button class="btn" data-val='{"a":1}' data-type="dict" data-why="Curly braces with key:value pairs → dict">{"a":1}</button>
+    </div>
+    <div class="readout" id="typeOut"></div>
+  </div>
+
+  <h3>Type conversion</h3>
+  <p>Sometimes you need to change a value's type. Use the type name as a function:</p>
+  <pre><button class="copy-btn">copy</button>x = "42"          # x is a string — you cannot do math on it
+y = int(x)         # y is now the integer 42
+z = float("3.14")  # z is 3.14, a float
+s = str(100)       # s is "100", a string again</pre>
+
+  <div class="key">
+    <strong>Pitfall:</strong> <code>"42" + 8</code> crashes with a TypeError. Python will not mix types silently. Convert first: <code>int("42") + 8 = 50</code>.
+  </div>
+</section>
+
+---
+
+<!-- 06 OPERATORS -->
+<section id="operators">
+  <div class="kicker">06 · Operators</div>
+  <h2>Doing things with values</h2>
+  <p class="lead">An <em>operator</em> is a symbol that performs an action on one or two values. Python has operators for math, comparison, logic, and more.</p>
+
+  <div class="note">
+    <strong>Analogy — kitchen verbs.</strong> Values are ingredients; operators are what you do to them (mix, slice, compare). Without operators, you can only store things — you can never cook.
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Category</th><th>Operators</th><th>Example</th><th>Result</th></tr>
+      <tr><td>Arithmetic</td><td><code>+ - * / // % **</code></td><td><code>17 // 5</code></td><td><code>3</code> (floor division)</td></tr>
+      <tr><td>Comparison</td><td><code>== != &lt; &gt; &lt;= &gt;=</code></td><td><code>10 &gt; 8</code></td><td><code>True</code></td></tr>
+      <tr><td>Logical</td><td><code>and or not</code></td><td><code>True and False</code></td><td><code>False</code></td></tr>
+      <tr><td>Assignment</td><td><code>= += -= *=</code></td><td><code>x += 5</code></td><td>adds 5 to <code>x</code></td></tr>
+      <tr><td>Identity</td><td><code>is  is not</code></td><td><code>x is None</code></td><td>checks object identity</td></tr>
+      <tr><td>Membership</td><td><code>in  not in</code></td><td><code>"a" in "cat"</code></td><td><code>True</code></td></tr>
+    </table>
+  </div>
+
+  <div class="lab">
+    <h4>⚡ Live arithmetic explorer</h4>
+    <p class="muted">Adjust A and B, then pick an operator. Every result updates instantly.</p>
+    <div class="ctrl"><label>A</label><input type="range" id="opA" min="-20" max="100" value="17"><span class="val" id="opAv">17</span></div>
+    <div class="ctrl"><label>B</label><input type="range" id="opB" min="1" max="20" value="5"><span class="val" id="opBv">5</span></div>
+    <div class="chips" id="opChips">
+      <button class="btn active" data-op="+">+</button>
+      <button class="btn" data-op="-">-</button>
+      <button class="btn" data-op="*">*</button>
+      <button class="btn" data-op="/">/</button>
+      <button class="btn" data-op="//">//</button>
+      <button class="btn" data-op="%">%</button>
+      <button class="btn" data-op="**">**</button>
+    </div>
+    <div class="readout" id="opOut"></div>
+  </div>
+
+  <h3>Worked example — the notebook problem</h3>
+  <p>A notebook costs ₹45. A student buys 8 notebooks and pays ₹500. How much change?</p>
+  <div class="card">
+    <div id="opStepBtn" class="chips"><button class="btn active" id="opNext">▶ Next step</button><button class="btn" id="opReset">↺ Reset</button></div>
+    <div class="readout" id="opStepOut" style="min-height:120px;"></div>
+  </div>
+
+  <div class="key">
+    <strong>Pitfall:</strong> <code>/</code> always gives a float (<code>7/2 = 3.5</code>). Use <code>//</code> for whole-number (floor) division (<code>7//2 = 3</code>). Use <code>%</code> for the remainder (<code>7%2 = 1</code>).
+  </div>
+</section>
+
+---
+
+<!-- 07 INPUT / OUTPUT -->
+<section id="input-output">
+  <div class="kicker">07 · Input &amp; Output</div>
+  <h2>Talking to the user</h2>
+  <p class="lead">Every useful program takes information in and sends results out. Python has two simple functions for this: <code>input()</code> and <code>print()</code>.</p>
+
+  <div class="note">
+    <strong>Analogy — a drive-through window.</strong> <code>input()</code> is the speaker where you place your order. <code>print()</code> is the window where you pick up the result.
+  </div>
+
+  <h3><code>print()</code> — sending output</h3>
+  <pre><button class="copy-btn">copy</button>print("Hello, world!")          # text
+print(42)                        # number
+print("Score:", 95, "/ 100")    # multiple values, separated by spaces
+name = "Alice"
+print(f"Hello, {name}!")        # f-string: embed a variable in text</pre>
+
+  <h3><code>input()</code> — reading input</h3>
+  <p><code>input()</code> always returns a <strong>string</strong>. To do math, convert it first.</p>
+  <pre><button class="copy-btn">copy</button>height = float(input("Enter your height in metres: "))
+weight = float(input("Enter your weight in kg: "))
+bmi = weight / (height ** 2)
+print(f"Your BMI is {bmi:.2f}")   # :.2f → show 2 decimal places</pre>
+
+  <div class="lab">
+    <h4>⚡ BMI calculator — simulate <code>input()</code></h4>
+    <p class="muted">Slide height and weight. The code reads the "input" and prints the result, just as Python would.</p>
+    <div class="ctrl"><label>Height (m)</label><input type="range" id="bmiH" min="1.0" max="2.2" step="0.01" value="1.70"><span class="val" id="bmiHv">1.70</span></div>
+    <div class="ctrl"><label>Weight (kg)</label><input type="range" id="bmiW" min="30" max="150" step="1" value="70"><span class="val" id="bmiWv">70</span></div>
+    <div class="readout" id="bmiOut"></div>
+  </div>
+
+  <div class="key">
+    <strong>Key insight:</strong> <code>input()</code> always gives you a string, even if the user typed a number. Always convert: <code>int(input(...))</code> or <code>float(input(...))</code>.
+  </div>
+</section>
+
+---
+
+<!-- 08 STRINGS -->
+<section id="strings">
+  <div class="kicker">08 · Strings &amp; Slicing</div>
+  <h2>Working with text</h2>
+  <p class="lead">A <em>string</em> is a sequence of characters — letters, digits, spaces, symbols — all in a row. Python gives you powerful tools to chop, search, and reshape strings.</p>
+
+  <div class="note">
+    <strong>Analogy — a train of carriages.</strong> Each character is one carriage. You can pick carriage 0, or carriages 2 to 5, or every other carriage. That is exactly what string slicing does.
+  </div>
+
+  <h3>Indexing — picking one character</h3>
+  <div class="eqbox">$$ s[i] \quad \text{character at position } i \text{ (counting from 0)} $$</div>
+  <pre><button class="copy-btn">copy</button>s = "Python"
+print(s[0])   # 'P'   (first character)
+print(s[-1])  # 'n'   (last character — negatives count from the end)</pre>
+
+  <h3>Slicing — picking a range</h3>
+  <div class="eqbox">$$ s[\text{start} : \text{stop} : \text{step}] $$</div>
+  <p>Gives characters from index <code>start</code> up to (but not including) <code>stop</code>, stepping by <code>step</code>.</p>
+  <pre><button class="copy-btn">copy</button>name = "Edunet Foundation"
+first = name[:6]       # "Edunet"  (stop=6, start defaults to 0)
+last  = name[7:]       # "Foundation"  (start=7, stop defaults to end)
+rev   = name[::-1]     # reverse the whole string</pre>
+
+  <h3>Useful string methods</h3>
+  <div class="grid2">
+    <div class="card"><code>.upper() .lower()</code><p>Change case. <code>"python".upper()</code> → <code>"PYTHON"</code>.</p></div>
+    <div class="card"><code>.replace(a, b)</code><p>Swap every occurrence of <code>a</code> with <code>b</code>.</p></div>
+    <div class="card"><code>.split(sep)</code><p>Break into a list at each separator.</p></div>
+    <div class="card"><code>.strip()</code><p>Remove leading and trailing whitespace.</p></div>
+    <div class="card"><code>len(s)</code><p>Number of characters. <code>len("hi")</code> → <code>2</code>.</p></div>
+    <div class="card"><code>f"..."</code><p>f-string: embed variables directly in text.</p></div>
+  </div>
+
+  <div class="lab">
+    <h4>⚡ String slicer — see the train of carriages</h4>
+    <p class="muted">Type a string, set start/stop/step. Each character lights up to show which ones are selected.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+      <input id="sliceStr" type="text" value="Python Rocks" style="flex:1;min-width:140px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 12px;color:var(--ink);font-family:var(--mono);font-size:.85rem;outline:none;">
+    </div>
+    <div class="ctrl"><label>start</label><input type="range" id="sliceStart" min="0" max="20" value="0"><span class="val" id="sliceStartV">0</span></div>
+    <div class="ctrl"><label>stop</label><input type="range" id="sliceStop" min="1" max="20" value="6"><span class="val" id="sliceStopV">6</span></div>
+    <div class="ctrl"><label>step</label><input type="range" id="sliceStep" min="1" max="4" value="1"><span class="val" id="sliceStepV">1</span></div>
+    <canvas id="sliceCanvas" height="80" style="width:100%;margin-top:8px;border-radius:8px;"></canvas>
+    <div class="readout" id="sliceOut"></div>
+  </div>
+
+  <div class="key">
+    <strong>Pitfall:</strong> Strings are <em>immutable</em>. You cannot change one character with <code>s[0] = "X"</code>. You must build a new string: <code>"X" + s[1:]</code>.
+  </div>
+</section>
+
+---
+
+<!-- 09 LISTS -->
+<section id="lists">
+  <div class="kicker">09 · Data Structures — Lists</div>
+  <h2>An ordered, changeable collection</h2>
+  <p class="lead">A <em>list</em> holds many values in a row, in order. Unlike a string, you can change a list after creating it — add items, remove items, reorder them.</p>
+
+  <div class="note">
+    <strong>Analogy — a shopping cart.</strong> Your cart has items in a specific order (the order you placed them). You can add a new item, remove one you changed your mind about, or check what is at position 2. That is a list.
+  </div>
+
+  <h3>Creating and indexing</h3>
+  <pre><button class="copy-btn">copy</button>fruits = ["apple", "banana", "cherry", "date", "fig", "grape"]
+print(fruits[0])    # "apple"    (index 0 = first)
+print(fruits[-1])   # "grape"    (index -1 = last)
+print(fruits[2:5])  # ["cherry", "date", "fig"]  (slice)</pre>
+
+  <h3>Common list operations</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Operation</th><th>Code</th><th>What it does</th></tr>
+      <tr><td>Add to end</td><td><code>fruits.append("kiwi")</code></td><td>Adds "kiwi" at the end</td></tr>
+      <tr><td>Insert at position</td><td><code>fruits.insert(2, "kiwi")</code></td><td>Inserts at index 2</td></tr>
+      <tr><td>Remove by value</td><td><code>fruits.remove("date")</code></td><td>Removes first "date"</td></tr>
+      <tr><td>Remove by index</td><td><code>fruits.pop(1)</code></td><td>Removes index 1, returns it</td></tr>
+      <tr><td>Sort</td><td><code>fruits.sort()</code></td><td>Alphabetical in-place</td></tr>
+      <tr><td>Reverse</td><td><code>fruits.reverse()</code></td><td>Reverses in-place</td></tr>
+      <tr><td>Length</td><td><code>len(fruits)</code></td><td>Number of items</td></tr>
+    </table>
+  </div>
+
+  <div class="lab">
+    <h4>⚡ Live list workshop</h4>
+    <p class="muted">Click operations and watch the list change. The readout shows the code and result at each step.</p>
+    <div class="chips" id="listChips">
+      <button class="btn active" data-lop="append">append</button>
+      <button class="btn" data-lop="insert">insert at 2</button>
+      <button class="btn" data-lop="remove">remove last</button>
+      <button class="btn" data-lop="sort">sort</button>
+      <button class="btn" data-lop="reverse">reverse</button>
+      <button class="btn" data-lop="reset">↺ reset</button>
+    </div>
+    <div class="readout" id="listOut"></div>
+  </div>
+
+  <h3>Worked example — average age</h3>
+  <p>Given <code>ages = [23, 45, 18, 34, 60, 50, 27]</code>, find the average.</p>
+  <div class="card">
+    <div class="readout" id="listAvgOut" style="min-height:80px;"></div>
+    <div class="chips" style="margin-top:8px;"><button class="btn active" id="listAvgStep">▶ Next step</button><button class="btn" id="listAvgReset">↺ Reset</button></div>
+  </div>
+
+  <div class="key">
+    <strong>Key insight:</strong> Lists are the most flexible structure. They are your first choice whenever you have a collection of values that might change.
+  </div>
+</section>
+
+---
+
+<!-- 10 TUPLES -->
+<section id="tuples">
+  <div class="kicker">10 · Data Structures — Tuples</div>
+  <h2>An ordered collection you cannot change</h2>
+  <p class="lead">A <em>tuple</em> is like a list, but <strong>immutable</strong> — once you create it, you cannot add, remove, or change items. Use tuples for data that should stay fixed.</p>
+
+  <div class="note">
+    <strong>Analogy — a printed receipt.</strong> A list is a whiteboard — you can erase and rewrite. A tuple is a printed receipt: the items are set. You can read them, but you cannot change them without reprinting.
+  </div>
+
+  <h3>Creating a tuple</h3>
+  <pre><button class="copy-btn">copy</button>coords = (10.5, 20.3)          # parentheses (optional, but clear)
+days   = ("Mon", "Tue", "Wed", "Thu", "Fri")
+single = (42,)                 # one-item tuple needs the trailing comma!
+
+print(coords[0])   # 10.5  (same indexing as lists)
+print(days[1:4])   # ('Tue', 'Wed', 'Thu')</pre>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>When to use a tuple</h4>
+      <p>Fixed data: GPS coordinates, RGB colours, days of the week, database records. Tuples are also slightly faster than lists for reading.</p>
+    </div>
+    <div class="card">
+      <h4>What you can still do</h4>
+      <p>Index (<code>t[0]</code>), slice (<code>t[1:3]</code>), measure (<code>len(t)</code>), search (<code>"Mon" in days</code>). You just cannot <em>change</em> the contents.</p>
+    </div>
+  </div>
+
+  <div class="lab">
+    <h4>⚡ List vs Tuple — spot the difference</h4>
+    <p class="muted">Click "Try to change" on each type and see what Python does differently.</p>
+    <div class="chips">
+      <button class="btn active" id="tvRead">Read item [1]</button>
+      <button class="btn" id="tvSlice">Slice [1:3]</button>
+      <button class="btn" id="tvChangeList">Change list[1]</button>
+      <button class="btn" id="tvChangeTuple">Change tuple[1]</button>
+    </div>
+    <div class="readout" id="tvOut"></div>
+  </div>
+
+  <div class="key">
+    <strong>Pitfall:</strong> Forgetting the trailing comma on a single-item tuple. <code>(42)</code> is just the number 42 in parentheses. <code>(42,)</code> is a one-item tuple.
+  </div>
+</section>
+
+---
+
+<!-- 11 SETS -->
+<section id="sets">
+  <div class="kicker">11 · Data Structures — Sets</div>
+  <h2>Unique items, no order</h2>
+  <p class="lead">A <em>set</em> stores items with two guarantees: <strong>no duplicates</strong> and <strong>no fixed order</strong>. It is optimised for membership tests and set operations (union, intersection, difference).</p>
+
+  <div class="note">
+    <strong>Analogy — a bag of coloured marbles (no duplicates).</strong> You reach in and pull one out — but you cannot ask "give me the third marble" because there is no order. You CAN ask "is there a red marble in here?" and get an answer instantly.
+  </div>
+
+  <h3>Creating and using sets</h3>
+  <pre><button class="copy-btn">copy</button>ws1 = {"Alice", "Bob", "Charlie", "David"}
+ws2 = {"Eve", "Bob", "Frank", "David"}
+
+print(ws1 & ws2)   # intersection: {'Bob', 'David'}
+print(ws1 | ws2)   # union: all unique names
+print(ws1 - ws2)   # difference: in ws1, not in ws2
+print("Alice" in ws1)  # True  — very fast check</pre>
+
+  <div class="lab">
+    <h4>⚡ Workshop overlap — Venn diagram live</h4>
+    <p class="muted">Toggle names into each workshop. See the intersection, union, and difference update on the canvas.</p>
+    <div class="grid2">
+      <div>
+        <h4 style="color:var(--cyan);">Workshop 1</h4>
+        <div class="chips" id="ws1chips"></div>
+      </div>
+      <div>
+        <h4 style="color:var(--violet);">Workshop 2</h4>
+        <div class="chips" id="ws2chips"></div>
+      </div>
+    </div>
+    <canvas id="setCanvas" height="180" style="width:100%;margin-top:12px;"></canvas>
+    <div class="readout" id="setOut"></div>
+  </div>
+
+  <div class="key">
+    <strong>Pitfall:</strong> To create an empty set, write <code>set()</code> — not <code>{}</code>. Curly braces with nothing inside create an empty <em>dictionary</em>, not a set.
+  </div>
+</section>
+
+---
+
+<!-- 12 DICTS -->
+<section id="dicts">
+  <div class="kicker">12 · Data Structures — Dictionaries</div>
+  <h2>Look things up by name, not position</h2>
+  <p class="lead">A <em>dictionary</em> stores <strong>key-value pairs</strong>. Instead of asking "give me item at index 3", you ask "give me the item whose key is 'name'".</p>
+
+  <div class="note">
+    <strong>Analogy — a real dictionary.</strong> You look up "photosynthesis", not "word number 4,312". The word is the key; the definition is the value. Python dictionaries work the same way, but the "words" can be numbers, strings, or tuples — anything immutable.
+  </div>
+
+  <h3>Creating and reading</h3>
+  <pre><button class="copy-btn">copy</button>student = {
+    "name": "Alice",
+    "age": 20,
+    "grades": [85, 90, 78],
+    "major": "Computer Science"
+}
+print(student["name"])     # "Alice"
+print(student["grades"])   # [85, 90, 78]</pre>
+
+  <h3>Common dictionary operations</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Operation</th><th>Code</th><th>Result</th></tr>
+      <tr><td>Add / update</td><td><code>d["major"] = "CS"</code></td><td>Sets the "major" key</td></tr>
+      <tr><td>Delete</td><td><code>del d["age"]</code></td><td>Removes the "age" key</td></tr>
+      <tr><td>All keys</td><td><code>d.keys()</code></td><td>All key names</td></tr>
+      <tr><td>All values</td><td><code>d.values()</code></td><td>All values</td></tr>
+      <tr><td>All pairs</td><td><code>d.items()</code></td><td>List of (key, value) tuples</td></tr>
+      <tr><td>Safe get</td><td><code>d.get("age", 0)</code></td><td>Returns 0 if "age" not found</td></tr>
+    </table>
+  </div>
+
+  <div class="lab">
+    <h4>⚡ Student record builder</h4>
+    <p class="muted">Edit the fields and watch the dictionary update live. The readout shows the code and computed average grade.</p>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;">
+      <div class="ctrl"><label>Name</label><input id="dName" type="text" value="Alice" style="background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 10px;color:var(--ink);font-family:var(--mono);font-size:.8rem;flex:1;outline:none;"></div>
+      <div class="ctrl"><label>Age</label><input type="range" id="dAge" min="16" max="30" value="20"><span class="val" id="dAgev">20</span></div>
+      <div class="ctrl"><label>Math grade</label><input type="range" id="dG1" min="0" max="100" value="85"><span class="val" id="dG1v">85</span></div>
+      <div class="ctrl"><label>Science grade</label><input type="range" id="dG2" min="0" max="100" value="90"><span class="val" id="dG2v">90</span></div>
+      <div class="ctrl"><label>English grade</label><input type="range" id="dG3" min="0" max="100" value="78"><span class="val" id="dG3v">78</span></div>
+    </div>
+    <div class="readout" id="dictOut"></div>
+  </div>
+
+  <div class="key">
+    <strong>Key insight:</strong> Dictionaries are at the heart of Python. JSON data (from APIs and files) maps almost perfectly to Python dicts. Learning dicts now pays dividends every time you work with real data.
+  </div>
+</section>
+
+---
+
+<!-- 13 IF/ELSE -->
+<section id="if-else">
+  <div class="kicker">13 · Control Flow</div>
+  <h2>Making decisions in code</h2>
+  <p class="lead"><code>if</code>, <code>elif</code>, and <code>else</code> let your program choose a path based on a condition. Without them, every program runs the same steps every time — no intelligence.</p>
+
+  <div class="note">
+    <strong>Analogy — a traffic light.</strong> Green → go. Orange → slow. Red → stop. The traffic light checks the current state and picks a behaviour. Your <code>if/elif/else</code> block does the same thing.
+  </div>
+
+  <h3>The structure</h3>
+  <pre><button class="copy-btn">copy</button>if condition_1:
+    # runs when condition_1 is True
+elif condition_2:
+    # runs when condition_1 is False AND condition_2 is True
+else:
+    # runs when every condition above is False</pre>
+
+  <h3>Worked example — age category</h3>
+  <p>Given a user's age, print whether they are a child, teenager, adult, or senior.</p>
+  <div class="card">
+    <div class="readout" id="ifStepOut" style="min-height:100px;"></div>
+    <div class="chips" style="margin-top:8px;"><button class="btn active" id="ifNext">▶ Next step</button><button class="btn" id="ifReset">↺ Reset</button></div>
+  </div>
+
+  <div class="lab">
+    <h4>⚡ Age classifier — drag and decide</h4>
+    <p class="muted">Slide the age. Watch which branch Python takes and why.</p>
+    <div class="ctrl"><label>Age</label><input type="range" id="ifAge" min="0" max="90" value="25"><span class="val" id="ifAgeV">25</span></div>
+    <canvas id="ifCanvas" height="120" style="width:100%;margin-top:8px;"></canvas>
+    <div class="readout" id="ifOut"></div>
+  </div>
+
+  <div class="key">
+    <strong>Pitfall:</strong> Indentation is the syntax in Python. Every line inside an <code>if</code> block must be indented by the same amount (4 spaces is standard). A wrong indent causes a crash — or worse, a silent logic error.
+  </div>
+</section>
+
+---
+
+<!-- 14 FOR LOOP -->
+<section id="for-loop">
+  <div class="kicker">14 · Loops — for</div>
+  <h2>Do something for each item</h2>
+  <p class="lead">A <code>for</code> loop runs a block of code once for each item in a sequence — a list, a string, a range of numbers, or a dictionary's items. It is the engine of almost all data processing.</p>
+
+  <div class="note">
+    <strong>Analogy — a conveyor belt in a factory.</strong> Each item comes down the belt. The worker does the same job on each one. When the belt is empty, the loop ends. The worker never has to count — Python tracks it.
+  </div>
+
+  <h3>The structure</h3>
+  <pre><button class="copy-btn">copy</button>for item in collection:
+    # do something with item</pre>
+
+  <h3>Common patterns</h3>
+  <pre><button class="copy-btn">copy</button># Loop over a list
+scores = [88, 72, 95, 61]
+for s in scores:
+    print(s)
+
+# Loop with an index
+for i, s in enumerate(scores):
+    print(f"Student {i+1}: {s}")
+
+# Loop over a range of numbers
+for i in range(1, 6):     # 1, 2, 3, 4, 5
+    print(i)
+
+# Loop over dictionary items
+grades = {"Alice": 90, "Bob": 75}
+for name, g in grades.items():
+    print(f"{name}: {g}")</pre>
+
+  <div class="lab">
+    <h4>⚡ Grade printer — step through the loop</h4>
+    <p class="muted">Press Next to advance one loop iteration. Watch the variable change each time.</p>
+    <div class="chips">
+      <button class="btn active" id="forNext">▶ Next iteration</button>
+      <button class="btn" id="forReset">↺ Reset</button>
+    </div>
+    <canvas id="forCanvas" height="160" style="width:100%;margin-top:8px;"></canvas>
+    <div class="readout" id="forOut"></div>
+  </div>
+
+  <h3>Worked example — grading each student</h3>
+  <p>Given a dictionary of scores, print a letter grade for each student. A ≥ 90, B ≥ 80, C ≥ 70, D ≥ 60, F otherwise.</p>
+  <pre><button class="copy-btn">copy</button>scores = {"Alice": 92, "Bob": 75, "Charlie": 88, "David": 55}
+
+for name, score in scores.items():
+    if score >= 90:
+        grade = "A"
+    elif score >= 80:
+        grade = "B"
+    elif score >= 70:
+        grade = "C"
+    elif score >= 60:
+        grade = "D"
+    else:
+        grade = "F"
+    print(f"{name}: {score} → {grade}")</pre>
+
+  <div class="key">
+    <strong>Key insight:</strong> <code>range(n)</code> gives integers 0, 1, …, n-1. <code>range(a, b)</code> gives a, a+1, …, b-1. <code>range(a, b, step)</code> adds a step. These three forms cover almost every counting need.
+  </div>
+</section>
+
+---
+
+<!-- 15 WHILE LOOP -->
+<section id="while-loop">
+  <div class="kicker">15 · Loops — while, break, continue</div>
+  <h2>Loop until a condition changes</h2>
+  <p class="lead">A <code>while</code> loop keeps running as long as a condition is <code>True</code>. Use it when you do not know in advance how many times you need to loop.</p>
+
+  <div class="note">
+    <strong>Analogy — filling a glass.</strong> You keep pouring until the glass is full. You do not decide upfront "pour exactly 5 times" — you pour, check, pour, check. That is a while loop.
+  </div>
+
+  <h3>Structure and example</h3>
+  <pre><button class="copy-btn">copy</button>total = 0
+numbers = []
+while total <= 100:
+    n = int(input("Enter a number: "))
+    total += n
+    numbers.append(n)
+print("Numbers:", numbers)
+print("Total:", total)</pre>
+
+  <h3><code>break</code> and <code>continue</code></h3>
+  <div class="grid2">
+    <div class="card">
+      <h4><code>break</code> — exit immediately</h4>
+      <p>Stop the loop right now, no matter what the condition says. Useful for "find the first match and stop".</p>
+      <pre style="font-size:.72rem;">for n in [2, 5, -1, 8]:
+    if n < 0:
+        break          # stop here
+    print(n)           # prints 2, 5</pre>
+    </div>
+    <div class="card">
+      <h4><code>continue</code> — skip this turn</h4>
+      <p>Skip the rest of this iteration and jump to the next one. Useful for "skip unwanted items".</p>
+      <pre style="font-size:.72rem;">for n in [2, 5, -1, 8]:
+    if n < 0:
+        continue       # skip negative
+    print(n)           # prints 2, 5, 8</pre>
+    </div>
+  </div>
+
+  <div class="lab">
+    <h4>⚡ Running total — watch <code>while</code> decide to stop</h4>
+    <p class="muted">Click "Add number" to push a random number onto the list. The loop condition checks after each addition.</p>
+    <div class="chips">
+      <button class="btn active" id="whileAdd">+ Add random number</button>
+      <button class="btn" id="whileReset">↺ Reset</button>
+    </div>
+    <canvas id="whileCanvas" height="140" style="width:100%;margin-top:8px;"></canvas>
+    <div class="readout" id="whileOut"></div>
+  </div>
+
+  <div class="key">
+    <strong>Pitfall:</strong> An infinite loop runs forever and freezes your program. Always make sure the condition inside a <code>while</code> loop can eventually become <code>False</code> — or include a <code>break</code>.
+  </div>
+</section>
+
+---
+
+<!-- 16 FUNCTIONS -->
+<section id="functions">
+  <div class="kicker">16 · Functions</div>
+  <h2>Write once, use many times</h2>
+  <p class="lead">A <em>function</em> is a named block of code that does one job. You define it once and call it by name whenever you need it — with different inputs each time.</p>
+
+  <div class="note">
+    <strong>Analogy — a recipe card.</strong> The recipe for banana bread is written once. Any time you want banana bread, you follow the recipe — with whatever bananas you have on hand. A function is your recipe card; calling it is baking the bread.
+  </div>
+
+  <h3>Defining and calling</h3>
+  <div class="eqbox">$$ \text{def } \texttt{function\_name(parameters)} \texttt{:} $$</div>
+  <pre><button class="copy-btn">copy</button>def calculate_average(numbers):
+    """Returns the average of a list of numbers."""
+    total = sum(numbers)
+    count = len(numbers)
+    return total / count
+
+scores = [85, 90, 78, 92]
+avg = calculate_average(scores)
+print(f"Average: {avg:.2f}")     # Average: 86.25</pre>
+
+  <h3>Parts of a function</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Part</th><th>What it is</th><th>Example</th></tr>
+      <tr><td><code>def</code></td><td>Keyword that starts the definition</td><td><code>def greet</code></td></tr>
+      <tr><td>Parameters</td><td>Inputs the function needs</td><td><code>(name, times=1)</code></td></tr>
+      <tr><td>Docstring</td><td>Optional description in triple quotes</td><td><code>"""Says hello."""</code></td></tr>
+      <tr><td>Body</td><td>Indented code that does the work</td><td>any code</td></tr>
+      <tr><td><code>return</code></td><td>Sends a value back to the caller</td><td><code>return result</code></td></tr>
+    </table>
+  </div>
+
+  <div class="lab">
+    <h4>⚡ Function explorer — see parameters flow in, results flow out</h4>
+    <p class="muted">Adjust the inputs and pick a function. Watch the parameters bind and the return value compute.</p>
+    <div class="chips" id="fnChips">
+      <button class="btn active" data-fn="avg">calculate_average</button>
+      <button class="btn" data-fn="mul">multiply_list</button>
+      <button class="btn" data-fn="bmi">bmi_category</button>
+    </div>
+    <div id="fnControls"></div>
+    <div class="readout" id="fnOut"></div>
+  </div>
+
+  <h3>Worked example — step through average</h3>
+  <p>Call <code>calculate_average([85, 90, 78, 92])</code> step by step.</p>
+  <div class="card">
+    <div class="readout" id="fnStepOut" style="min-height:120px;"></div>
+    <div class="chips" style="margin-top:8px;"><button class="btn active" id="fnNext">▶ Next step</button><button class="btn" id="fnReset">↺ Reset</button></div>
+  </div>
+
+  <div class="key">
+    <strong>Key insight:</strong> Functions with <em>default parameter values</em> (e.g. <code>times=1</code>) let the caller omit that argument. The function still works — it just uses the default. This makes your functions flexible without requiring extra code from the caller.
+  </div>
+</section>
+
+---
+
+<!-- 17 FILE HANDLING -->
+<section id="file-handling">
+  <div class="kicker">17 · File Handling</div>
+  <h2>Reading and writing files</h2>
+  <p class="lead">Real data lives in files — CSV spreadsheets, text logs, configuration files. Python gives you simple tools to read from and write to them.</p>
+
+  <div class="note">
+    <strong>Analogy — a filing cabinet.</strong> Opening a file is like pulling open a drawer. Reading is like scanning the pages. Writing is like adding a new sheet. Closing is like pushing the drawer shut so no one else gets confused. Always close the drawer when you are done.
+  </div>
+
+  <h3>The flow</h3>
+  <p>Every file operation follows four steps: <strong>Open → Read or Write → Process → Close</strong>.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Mode</th><th>Meaning</th><th>File exists?</th><th>File missing?</th></tr>
+      <tr><td><code>"r"</code></td><td>Read</td><td>OK</td><td>Error</td></tr>
+      <tr><td><code>"w"</code></td><td>Write (overwrite)</td><td>Clears it</td><td>Creates it</td></tr>
+      <tr><td><code>"a"</code></td><td>Append</td><td>Adds to end</td><td>Creates it</td></tr>
+      <tr><td><code>"r+"</code></td><td>Read and write</td><td>OK</td><td>Error</td></tr>
+    </table>
+  </div>
+
+  <h3>The safe way — <code>with</code> statement</h3>
+  <p>The <code>with</code> statement closes the file automatically, even if an error happens. Always use it.</p>
+  <pre><button class="copy-btn">copy</button># Writing
+with open("grades.txt", "w") as f:
+    students = [("Alice", "A"), ("Bob", "B+"), ("Charlie", "A-")]
+    for name, grade in students:
+        f.write(f"{name},{grade}\n")
+
+# Reading
+with open("grades.txt", "r") as f:
+    for line in f:
+        name, grade = line.strip().split(",")
+        print(f"{name} got {grade}")</pre>
+
+  <div class="lab">
+    <h4>⚡ File operation step-through</h4>
+    <p class="muted">Step through writing three student records to a file, then reading them back.</p>
+    <div class="chips">
+      <button class="btn active" id="fileNext">▶ Next step</button>
+      <button class="btn" id="fileReset">↺ Reset</button>
+    </div>
+    <div class="readout" id="fileOut" style="min-height:160px;"></div>
+  </div>
+
+  <h3>Reading a CSV — worked example</h3>
+  <pre><button class="copy-btn">copy</button># products.csv has lines like: Notebook,45
+with open("products.csv", "r") as f:
+    total = 0
+    for line in f:
+        parts = line.strip().split(",")
+        name  = parts[0]
+        price = float(parts[1])
+        total += price
+    print(f"Total cost: ₹{total:.2f}")</pre>
+
+  <div class="key">
+    <strong>Pitfall:</strong> Always call <code>.strip()</code> on each line before splitting. Every line from a file ends with <code>\n</code> (a newline character). Without <code>strip()</code>, your last value has an invisible <code>\n</code> attached — and <code>float("45\n")</code> crashes.
+  </div>
+</section>
+
+---
+
+<!-- SYNTHESIS / WRAP UP -->
+<section id="wrapup" style="border-bottom:none;">
+  <div class="kicker">Wrap Up</div>
+  <h2>Everything you now know</h2>
+  <p class="lead">You have walked through every building block of Python — from your first variable to reading files. Here is the full map in one view.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>Concept</th><th>One-line summary</th><th>Key tool</th></tr>
+      <tr><td>Python</td><td>Interpreted, readable, powerful</td><td><code>python file.py</code></td></tr>
+      <tr><td>Variables</td><td>Named boxes for values</td><td><code>x = 42</code></td></tr>
+      <tr><td>Data types</td><td>int, float, str, bool</td><td><code>type(x)</code></td></tr>
+      <tr><td>Operators</td><td>Act on values: <code>+ - * / // % **</code></td><td><code>==, !=, and, or</code></td></tr>
+      <tr><td>Input/Output</td><td>Talk to the user</td><td><code>input()</code>, <code>print()</code></td></tr>
+      <tr><td>Strings</td><td>Text, sliceable, immutable</td><td><code>s[a:b:step]</code></td></tr>
+      <tr><td>Lists</td><td>Ordered, mutable collection</td><td><code>.append()</code>, <code>.sort()</code></td></tr>
+      <tr><td>Tuples</td><td>Ordered, immutable collection</td><td><code>(a, b, c)</code></td></tr>
+      <tr><td>Sets</td><td>Unique items, fast lookup</td><td><code>&amp; | -</code></td></tr>
+      <tr><td>Dicts</td><td>Key-value pairs</td><td><code>d[key]</code>, <code>.items()</code></td></tr>
+      <tr><td>if/elif/else</td><td>Choose a path</td><td>conditions + indent</td></tr>
+      <tr><td>for loop</td><td>Once per item</td><td><code>for x in collection</code></td></tr>
+      <tr><td>while loop</td><td>Until condition is False</td><td><code>break</code>, <code>continue</code></td></tr>
+      <tr><td>Functions</td><td>Named, reusable code block</td><td><code>def f(params): return val</code></td></tr>
+      <tr><td>File handling</td><td>Read/write persistent data</td><td><code>with open() as f</code></td></tr>
+    </table>
+  </div>
+
+  <div class="card" style="margin-top:24px;">
+    <h4>🎯 Check yourself — active recall</h4>
+    <p style="margin-bottom:10px;">What is the difference between a list and a tuple? Try to answer before revealing.</p>
+    <button class="btn active" id="recallBtn1">Reveal answer</button>
+    <div id="recallAns1" style="display:none;margin-top:12px;color:var(--muted);">
+      A <strong>list</strong> (<code>[...]</code>) is mutable — you can add, remove, and change items after creation. A <strong>tuple</strong> (<code>(...)</code>) is immutable — once created, it cannot change. Use lists when the data changes; use tuples for fixed data like coordinates or days of the week.
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:12px;">
+    <h4>🎯 Check yourself — active recall</h4>
+    <p style="margin-bottom:10px;">Why do you always need to convert the result of <code>input()</code> before doing math?</p>
+    <button class="btn active" id="recallBtn2">Reveal answer</button>
+    <div id="recallAns2" style="display:none;margin-top:12px;color:var(--muted);">
+      <code>input()</code> always returns a <strong>string</strong>, even if the user typed a number. Python will not silently mix a string and a number. You must convert first: <code>int(input(...))</code> or <code>float(input(...))</code>, otherwise you get a <code>TypeError</code>.
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- STORY CARD -->
+<div class="storycard" id="storycard">
+  <div class="st-title" id="stTitle">—</div>
+  <div class="st-text" id="stText">—</div>
+  <div class="st-btns">
+    <button class="btn" id="stPrev">◀ Prev</button>
+    <button class="btn active" id="stPlay">⏸ Pause</button>
+    <button class="btn" id="stNext">Next ▶</button>
+    <button class="btn" id="stExit">✕ Exit</button>
+  </div>
+</div>
+<div class="spot-ring" id="spotRing"></div>
+
+<!-- MATHJAX -->
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+  svg: { fontCache: 'global' },
+  startup: { typeset: false }
+};
+</script>
+<script src="[cdnjs.cloudflare.com](https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-svg.min.js)"></script>
+
+<script>
+/* ── HELPERS ── */
+const $  = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+const clamp = (v,a,b) => Math.max(a, Math.min(b,v));
+const fmt = (x, d=2) => { if(Math.abs(x)<1e-9)x=0; return x.toFixed(d); };
+const fmtINR = n => '₹' + n.toLocaleString('en-IN');
+
+/* ── DEMO REGISTRY ── */
+window.__demos = [];
+function runDemos(){ window.__demos.forEach(f=>{ try{f();}catch(e){console.error(e);} }); }
+
+/* ── COPY BUTTONS ── */
+function initCopyBtns(){
+  $$('pre').forEach(pre=>{
+    const btn = pre.querySelector('.copy-btn');
+    if(!btn) return;
+    btn.addEventListener('click',()=>{
+      const txt = pre.innerText.replace('copy\n','');
+      navigator.clipboard.writeText(txt).then(()=>{ btn.textContent='✓ copied'; setTimeout(()=>btn.textContent='copy',1500); });
+    });
+  });
+}
+
+/* ══════════════════════════════════════════════
+   01  COMPILER VS INTERPRETER DEMO
+══════════════════════════════════════════════ */
+window.__demos.push(function(){
+  const out = $('#cmpOut'); if(!out) return;
+  const compiled = [
+    'Step 1: Write code → hello.c',
+    'Step 2: Compile → gcc hello.c -o hello  (takes time)',
+    'Step 3: Run the compiled binary → ./hello',
+    '────────────────────────────────',
+    'Output: Hello, World!',
+    '(3 steps, extra wait, but runs very fast forever after)'
+  ];
+  const interpreted = [
+    'Step 1: Write code → hello.py',
+    'Step 2: python3 hello.py  ← that\'s it, run immediately',
+    '────────────────────────────────',
+    'Output: Hello, World!',
+    '(2 steps, instant feedback, Python translates each line as it runs)'
+  ];
+  let mode = 'compiled';
+  function render(){
+    const lines = mode === 'compiled' ? compiled : interpreted;
+    out.innerHTML = lines.map((l,i) =>
+      l.startsWith('─') ? `<span class="hl">${l}</span>` :
+      l.startsWith('Output') ? `<span class="g">${l}</span>` :
+      `<span style="color:var(--muted);">Step ${i+1<=3?i+1:''}  </span>${l}`
+    ).join('\n');
+  }
+  $('#cmpComp').addEventListener('click',()=>{ mode='compiled'; $$('#cmpComp,#cmpInterp').forEach(b=>b.classList.remove('active')); $('#cmpComp').classList.add('active'); render(); });
+  $('#cmpInterp').addEventListener('click',()=>{ mode='interp'; $$('#cmpComp,#cmpInterp').forEach(b=>b.classList.remove('active')); $('#cmpInterp').classList.add('active'); render(); });
+  render();
+});
+
+/* ══════════════════════════════════════════════
+   02  JUPYTER CELL SIMULATOR
+══════════════════════════════════════════════ */
+window.__demos.push(function(){
+  const inp = $('#cellInput'); const out = $('#cellOut'); if(!inp||!out) return;
+  let cellNum = 1;
+  function evalCell(){
+    const raw = inp.value.trim();
+    let result;
+    try {
+      if(raw.startsWith('"') || raw.startsWith("'")){
+        result = String(eval(raw));
+      } else if(raw.includes('len(')){
+        const m = raw.match(/len\("([^"]*)"\)/);
+        result = m ? String(m[1].length) : String(eval(raw));
+      } else {
+        result = String(eval(raw));
+      }
+      out.innerHTML = `In [${cellNum}]: <span class="hl">${raw}</span>\nOut[${cellNum}]: <span class="g">${result}</span>`;
+    } catch(e) {
+      out.innerHTML = `In [${cellNum}]: <span class="hl">${raw}</span>\n<span class="er">Error: ${e.message}</span>`;
+    }
+    cellNum++;
+    inp.value = '';
+  }
+  $('#cellRun').addEventListener('click', evalCell);
+  inp.addEventListener('keydown', e=>{ if(e.key==='Enter') evalCell(); });
+});
+
+/* ══════════════════════════════════════════════
+   03  VARIABLES / PROFIT CALCULATOR
+══════════════════════════════════════════════ */
+window.__demos.push(function(){
+  const ids = ['vQ1','vQ2','vQ3','vQ4'];
+  function draw(){
+    const vals = ids.map(id=>parseInt($('#'+id).value));
+    ids.forEach((id,i)=>{ $('#'+id+'v').textContent = fmtINR(vals[i]); });
+    const total = vals.reduce((a,v)=>a+v,0);
+    const avg = total/4;
+    $('#varOut').innerHTML =
+      `profit_q1 = <span class="hl">${fmtINR(vals[0])}</span>
+profit_q2 = <span class="hl">${fmtINR(vals[1])}</span>
+profit_q3 = <span class="hl">${fmtINR(vals[2])}</span>
+profit_q4 = <span class="hl">${fmtINR(vals[3])}</span>
+
+total = profit_q1 + profit_q2 + profit_q3 + profit_q4
+      = <span class="g">${fmtINR(total)}</span>
+
+average_profit = total / 4 = <span class="g">${fmtINR(Math.round(avg))}</span>`;
+  }
+  ids.forEach(id=>$('#'+id).addEventListener('input',draw));
+  draw();
+});
+
+/* ══════════════════════════════════════════════
+   04  DATA TYPE DETECTOR
+══════════════════════════════════════════════ */
+window.__demos.push(function(){
+  const out = $('#typeOut'); if(!out) return;
+  $$('#typeChips .btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      $$('#typeChips .btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const v = btn.dataset.val, t = btn.dataset.type, why = btn.dataset.why;
+      out.innerHTML =
+        `>>> type(${v})\n<span class="g">&lt;class '${t}'&gt;</span>\n\n💡 Why? ${why}`;
+      if(window.MathJax) MathJax.typesetPromise([out]);
+    });
+  });
+  // init
+  const first = $('#typeChips .btn');
+  out.innerHTML = `>>> type(${first.dataset.val})\n<span class="g">&lt;class '${first.dataset.type}'&gt;</span>\n\n💡 Why? ${first.dataset.why}`;
+});
+
+/* ══════════════════════════════════════════════
+   05  OPERATORS LIVE EXPLORER
+══════════════════════════════════════════════ */
+window.__demos.push(function(){
+  const out = $('#opOut'); if(!out) return;
+  let curOp = '+';
+  function draw(){
+    const A = parseInt($('#opA').value);
+    const B = parseInt($('#opB').value);
+    $('#opAv').textContent = A;
+    $('#opBv').textContent = B;
+    let result, explain;
+    switch(curOp){
+      case '+': result=A+B; explain='addition'; break;
+      case '-': result=A-B; explain='subtraction'; break;
+      case '*': result=A*B; explain='multiplication'; break;
+      case '/': result=(A/B).toFixed(4); explain='true division (always float)'; break;
+      case '//': result=Math.floor(A/B); explain='floor division (round down)'; break;
+      case '%': result=((A%B)+B)%B; explain=`remainder after dividing ${A} by ${B}`; break;
+      case '**': result=Math.pow(A,B); explain=`${A} raised to the power ${B}`; break;
+    }
+    out.innerHTML = `A = <span class="hl">${A}</span>,  B = <span class="hl">${B}</span>
+
+A ${curOp} B  →  <span class="g">${result}</span>
+
+(${explain})`;
+  }
+  $$('#opChips .btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      $$('#opChips .btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      curOp = btn.dataset.op;
+      draw();
+    });
+  });
+  $$('#opA,#opB').forEach(el=>el.addEventListener('input',draw));
+  draw();
+});
+
+/* OPERATORS STEP THROUGH */
+window.__demos.push(function(){
+  const out = $('#opStepOut'); if(!out) return;
+  const steps = [
+    'Given: price = 45,  qty = 8,  paid = 500',
+    'Step 1 — total cost:\n  total = price * qty\n       = 45 * 8\n       = <span class="hl">360</span>',
+    'Step 2 — change:\n  change = paid - total\n         = 500 - 360\n         = <span class="g">140</span>',
+    'Answer: the student gets back <span class="g">₹140</span>'
+  ];
+  let i = 0;
+  function render(){ let s=''; for(let k=0;k<=i;k++) s+=(k?'\n\n':'')+steps[k]; out.innerHTML=s; }
+  render();
+  $('#opNext').addEventListener('click',()=>{ if(i<steps.length-1){i++;render();} });
+  $('#opReset').addEventListener('click',()=>{ i=0; render(); });
+});
+
+/* ══════════════════════════════════════════════
+   06  BMI CALCULATOR (input/output)
+══════════════════════════════════════════════ */
+window.__demos.push(function(){
+  const out = $('#bmiOut'); if(!out) return;
+  function draw(){
+    const h = parseFloat($('#bmiH').value);
+    const w = parseFloat($('#bmiW').value);
+    $('#bmiHv').textContent = h.toFixed(2);
+    $('#bmiWv').textContent = w;
+    const bmi = w/(h*h);
+    let cat;
+    if(bmi<18.5) cat='Underweight';
+    else if(bmi<25) cat='Normal weight';
+    else if(bmi<30) cat='Overweight';
+    else cat='Obese';
+    out.innerHTML =
+      `height = float(input("Enter height: "))  →  <span class="hl">${h.toFixed(2)}</span>
+weight = float(input("Enter weight: "))  →  <span class="hl">${w}</span>
+
+bmi = weight / (height ** 2)
+    = ${w} / (${h.toFixed(2)} ** 2)
+    = ${w} / ${fmt(h*h,4)}
+    = <span class="g">${fmt(bmi,2)}</span>
+
+print(f"Your BMI is {bmi:.2f}")
+→  Category: <span class="g">${cat}</span>`;
+  }
+  $$('#bmiH,#bmiW').forEach(el=>el.addEventListener('input',draw));
+  draw();
+});
+
+/* ══════════════════════════════════════════════
+   07  STRING SLICER CANVAS
+══════════════════════════════════════════════ */
+window.__demos.push(function(){
+  const c = $('#sliceCanvas'); if(!c) return;
+  const ctx = c.getContext('2d');
+
+  function draw(){
+    const s = $('#sliceStr').value || "Python";
+    const maxStop = s.length;
+    const start = parseInt($('#sliceStart').value);
+    let stop  = parseInt($('#sliceStop').value);
+    const step  = parseInt($('#sliceStep').value);
+    // clamp
+    stop = Math.min(stop, maxStop);
+    $('#sliceStop').max = maxStop;
+    $('#sliceStartV').textContent = start;
+    $('#sliceStopV').textContent  = stop;
+    $('#sliceStepV').textContent  = step;
+
+    const W = c.clientWidth || 600;
+    c.width = Math.round(W * (Math.min(window.devicePixelRatio||1,2)));
+    c.height = 80 * (Math.min(window.devicePixelRatio||1,2));
+    ctx.setTransform(Math.min(window.devicePixelRatio||1,2),0,0,Math.min(window.devicePixelRatio||1,2),0,0);
+    ctx.clearRect(0,0,W,80);
+
+    const n = s.length;
+    const boxW = Math.min(48, Math.floor((W-20)/Math.max(n,1)));
+    const ox = (W - boxW*n)/2;
+
+    for(let i=0;i<n;i++){
+      const selected = i>=start && i<stop && (i-start)%step===0;
+      const x = ox + i*boxW;
+      ctx.fillStyle = selected ? 'rgba(56,240,216,.25)' : 'rgba(14,23,41,.8)';
+      ctx.strokeStyle = selected ? '#38f0d8' : '#1f2d4d';
+      ctx.lineWidth = selected ? 2 : 1;
+      ctx.beginPath();
+      ctx.roundRect(x+2, 8, boxW-4, 44, 6);
+      ctx.fill(); ctx.stroke();
+      ctx.fillStyle = selected ? '#38f0d8' : '#93a4c8';
+      ctx.font = `bold ${Math.min(18,boxW-6)}px monospace`;
+      ctx.textAlign='center';
+      ctx.fillText(s[i], x+boxW/2, 36);
+      ctx.fillStyle = '#64759c';
+      ctx.font = '10px monospace';
+      ctx.fillText(i, x+boxW/2, 62);
+      ctx.textAlign='left';
+    }
+
+    const slice = s.slice(start, stop, undefined);
+    let manualSlice = '';
+    for(let i=start;i<stop;i+=step) manualSlice+=s[i]||'';
+
+    $('#sliceOut').innerHTML =
+      `s = <span class="hl">"${s}"</span>   (length = ${n})
+s[${start}:${stop}:${step}]  →  <span class="g">"${manualSlice}"</span>
+(characters at positions: ${Array.from({length:Math.ceil((stop-start)/step)},(_,k)=>start+k*step).filter(i=>i<n).join(', ')})`;
+  }
+  $$('#sliceStr,#sliceStart,#sliceStop,#sliceStep').forEach(el=>el.addEventListener('input',draw));
+  window.addEventListener('resize',draw);
+  draw();
+});
+
+/* ══════════════════════════════════════════════
+   08  LISTS LIVE WORKSHOP
+══════════════════════════════════════════════ */
+window.__demos.push(function(){
+  const out = $('#listOut'); if(!out) return;
+  let lst = ["apple","banana","cherry","date","fig","grape"];
+  let log = [];
+  function render(){
+    const header = `fruits = <span class="hl">${JSON.stringify(lst)}</span>  (length: ${lst.length})`;
+    const history = log.slice(-4).map(l=>`<span class="g">→ ${l}</span>`).join('\n');
+    out.innerHTML = header + (log.length ? '\n\n' + history : '');
+  }
+  $$('#listChips .btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const op = btn.dataset.lop;
+      if(op==='append'){ lst.push('kiwi'); log.push('appended "kiwi"'); }
+      else if(op==='insert'){ lst.splice(2,0,'mango'); log.push('inserted "mango" at index 2'); }
+      else if(op==='remove' && lst.length){ const r=lst.pop(); log.push(`removed "${r}" from end`); }
+      else if(op==='sort'){ lst.sort(); log.push('sorted alphabetically'); }
+      else if(op==='reverse'){ lst.reverse(); log.push('reversed'); }
+      else if(op==='reset'){ lst=["apple","banana","cherry","date","fig","grape"]; log=[]; }
+      render();
+    });
+  });
+  render();
+});
+
+/* LIST AVERAGE STEP */
+window.__demos.push(function(){
+  const out = $('#listAvgOut'); if(!out) return;
+  const ages = [23,45,18,34,60,50,27];
+  const total = ages.reduce((a,v)=>a+v,0);
+  const avg = total/ages.length;
+  const steps = [
+    `ages = <span class="hl">[23, 45, 18, 34, 60, 50, 27]</span>`,
+    `Step 1 — total:\n  sum(ages) = 23 + 45 + 18 + 34 + 60 + 50 + 27 = <span class="hl">${total}</span>`,
+    `Step 2 — count:\n  len(ages) = <span class="hl">${ages.length}</span>`,
+    `Step 3 — average:\n  average = total / count = ${total} / ${ages.length} = <span class="g">${fmt(avg,2)}</span>`,
+    `Answer: average age = <span class="g">${fmt(avg,2)}</span> years`
+  ];
+  let i=0;
+  function render(){ let s=''; for(let k=0;k<=i;k++) s+=(k?'\n\n':'')+steps[k]; out.innerHTML=s; }
+  render();
+  $('#listAvgStep').addEventListener('click',()=>{ if(i<steps.length-1){i++;render();} });
+  $('#listAvgReset').addEventListener('click',()=>{ i=0; render(); });
+});
+
+/* ══════════════════════════════════════════════
+   09  TUPLE VS LIST DEMO
+══════════════════════════════════════════════ */
+window.__demos.push(function(){
+  const out = $('#tvOut'); if(!out) return;
+  const myList  = ["Alice","Bob","Charlie","David","Eve"];
+  const myTuple = ["Alice","Bob","Charlie","David","Eve"]; // frozen conceptually
+
+  $('#tvRead').addEventListener('click',()=>{
+    out.innerHTML =
+      `my_list[1]  = <span class="g">"${myList[1]}"</span>   ✓ works on a list
+my_tuple[1] = <span class="g">"${myTuple[1]}"</span>  ✓ works on a tuple too\n\nBoth support indexing — reading is fine for either type.`;
+  });
+  $('#tvSlice').addEventListener('click',()=>{
+    out.innerHTML =
+      `my_list[1:3]  = <span class="g">${JSON.stringify(myList.slice(1,3))}</span>
+my_tuple[1:3] = <span class="g">${JSON.stringify(myTuple.slice(1,3))}</span>\n\nBoth support slicing — no difference here.`;
+  });
+  $('#tvChangeList').addEventListener('click',()=>{
+    out.innerHTML =
+      `my_list[1] = "Zara"
+my_list = <span class="g">["Alice", "Zara", "Charlie", "David", "Eve"]</span>  ✓ list updated!\n\nLists are mutable — you can change them after creation.`;
+  });
+  $('#tvChangeTuple').addEventListener('click',()=>{
+    out.innerHTML =
+      `my_tuple[1] = "Zara"\n<span class="er">TypeError: 'tuple' object does not support item assignment</span>\n\nTuples are immutable — Python refuses to change them.`;
+  });
+  // init
+  out.innerHTML = `my_list  = <span class="hl">["Alice","Bob","Charlie","David","Eve"]</span>\nmy_tuple = <span class="hl">("Alice","Bob","Charlie","David","Eve")</span>\n\nPress a button above to compare what each type allows.`;
+});
+
+/* ══════════════════════════════════════════════
+   10  SETS VENN CANVAS
+══════════════════════════════════════════════ */
+window.__demos.push(function(){
+  const c = $('#setCanvas'); if(!c) return;
+  const ctx = c.getContext('2d');
+  const NAMES = ["Alice","Bob","Charlie","David","Eve","Frank"];
+  let ws1 = new Set(["Alice","Bob","Charlie","David"]);
+  let ws2 = new Set(["Eve","Bob","Frank","David"]);
+
+  function buildChips(){
+    ['ws1chips','ws2chips'].forEach((id,wi)=>{
+      const wSet = wi===0 ? ws1 : ws2;
+      const container = $('#'+id);
+      container.innerHTML = '';
+      NAMES.forEach(name=>{
+        const btn = document.createElement('button');
+        btn.className = 'btn' + (wSet.has(name)?' active':'');
+        btn.textContent = name;
+        btn.addEventListener('click',()=>{
+          if(wSet.has(name)) wSet.delete(name);
+          else wSet.add(name);
+          buildChips();
+          drawVenn();
+        });
+        container.appendChild(btn);
+      });
+    });
+  }
+
+  function drawVenn(){
+    const W = c.clientWidth||600, H = 180;
+    c.width = Math.round(W*(Math.min(window.devicePixelRatio||1,2)));
+    c.height = Math.round(H*(Math.min(window.devicePixelRatio||1,2)));
+    ctx.setTransform(Math.min(window.devicePixelRatio||1,2),0,0,Math.min(window.devicePixelRatio||1,2),0,0);
+    ctx.clearRect(0,0,W,H);
+
+    const r=70, cx1=W/2-50, cx2=W/2+50, cy=H/2;
+    // circles
+    ctx.globalAlpha=0.18;
+    ctx.fillStyle='#38f0d8'; ctx.beginPath(); ctx.arc(cx1,cy,r,0,7); ctx.fill();
+    ctx.fillStyle='#9b8cff'; ctx.beginPath(); ctx.arc(cx2,cy,r,0,7); ctx.fill();
+    ctx.globalAlpha=1;
+    ctx.strokeStyle='#38f0d8'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(cx1,cy,r,0,7); ctx.stroke();
+    ctx.strokeStyle='#9b8cff'; ctx.beginPath(); ctx.arc(cx2,cy,r,0,7); ctx.stroke();
+
+    // labels
+    ctx.fillStyle='#38f0d8'; ctx.font='bold 11px monospace'; ctx.textAlign='center';
+    ctx.fillText('Workshop 1',cx1-20,cy-r-8);
+    ctx.fillStyle='#9b8cff';
+    ctx.fillText('Workshop 2',cx2+20,cy-r-8);
+
+    // names
+    const inter=[...ws1].filter(n=>ws2.has(n));
+    const only1=[...ws1].filter(n=>!ws2.has(n));
+    const only2=[...ws2].filter(n=>!ws1.has(n));
+
+    ctx.font='10px monospace'; ctx.textAlign='center';
+    ctx.fillStyle='#38f0d8';
+    only1.forEach((n,i)=>ctx.fillText(n,cx1-30,cy-20+i*18));
+    ctx.fillStyle='#ffcb6b';
+    inter.forEach((n,i)=>ctx.fillText(n,(cx1+cx2)/2,cy-10+i*18));
+    ctx.fillStyle='#9b8cff';
+    only2.forEach((n,i)=>ctx.fillText(n,cx2+30,cy-20+i*18));
+
+    ctx.textAlign='left';
+    $('#setOut').innerHTML =
+      `ws1 = <span class="hl">{${[...ws1].join(', ')}}</span>
+ws2 = <span class="hl">{${[...ws2].join(', ')}}</span>
+
+ws1 & ws2  (intersection) = <span class="g">{${inter.join(', ')||'—'}}</span>
+ws1 | ws2  (union)        = <span class="g">{${[...new Set([...ws1,...ws2])].join(', ')}}</span>
+ws1 - ws2  (only in ws1)  = <span class="g">{${only1.join(', ')||'—'}}</span>`;
+  }
+
+  buildChips();
+  drawVenn();
+  window.addEventListener('resize',drawVenn);
+});
+
+/* ══════════════════════════════════════════════
+   11  DICTIONARY BUILDER
+══════════════════════════════════════════════ */
+window.__demos.push(function(){
+  const out = $('#dictOut'); if(!out) return;
+  function draw(){
+    const name = $('#dName').value || 'Alice';
+    const age = parseInt($('#dAge').value);
+    const g1 = parseInt($('#dG1').value);
+    const g2 = parseInt($('#dG2').value);
+    const g3 = parseInt($('#dG3').value);
+    ['dAge','dG1','dG2','dG3'].forEach(id=>{
+      $('#'+id+'v').textContent = $(`#${id}`).value;
+    });
+    const grades=[g1,g2,g3];
+    const avg = grades.reduce((a,v)=>a+v,0)/3;
+    out.innerHTML =
+      `student = {\n    "name":   <span class="hl">"${name}"</span>,\n    "age":    <span class="hl">${age}</span>,\n    "grades": <span class="hl">[${g1}, ${g2}, ${g3}]</span>,\n    "major":  "Computer Science"\n}\n\naverage_grade = sum(grades) / len(grades)\n             = (${g1} + ${g2} + ${g3}) / 3\n             = <span class="g">${fmt(avg,2)}</span>`;
+  }
+  $$('#dName,#dAge,#dG1,#dG2,#dG3').forEach(el=>el.addEventListener('input',draw));
+  draw();
+});
+
+/* ══════════════════════════════════════════════
+   12  IF/ELSE STEP THROUGH
+══════════════════════════════════════════════ */
+window.__demos.push(function(){
+  const out = $('#ifStepOut'); if(!out) return;
+  const steps = [
+    'Given: age = 17',
+    'Step 1 — check first condition:\n  if age <= 12:   →  17 <= 12  →  <span class="er">False</span>  (skip this block)',
+    'Step 2 — check second condition:\n  elif age <= 19:  →  17 <= 19  →  <span class="g">True</span>  ✓ (enter this block)',
+    'Step 3 — run the matching block:\n  print("Teenager")  →  <span class="g">Teenager</span>',
+    'Step 4 — done. Python skips the rest of the elif/else chain.'
+  ];
+  let i=0;
+  function render(){ let s=''; for(let k=0;k<=i;k++) s+=(k?'\n\n':'')+steps[k]; out.innerHTML=s; }
+  render();
+  $('#ifNext').addEventListener('click',()=>{ if(i<steps.length-1){i++;render();} });
+  $('#ifReset').addEventListener('click',()=>{ i=0; render(); });
+});
+
+/* IF/ELSE CANVAS */
+window.__demos.push(function(){
+  const c = $('#ifCanvas'); if(!c) return;
+  const ctx = c.getContext('2d');
+  const out = $('#ifOut'); if(!out) return;
+
+  function draw(){
+    const age = parseInt($('#ifAge').value);
+    $('#ifAgeV').textContent = age;
+
+    const W = c.clientWidth||600, H = 120;
+    c.width = Math.round(W*(Math.min(window.devicePixelRatio||1,2)));
+    c.height = Math.round(H*(Math.min(window.devicePixelRatio||1,2)));
+    ctx.setTransform(Math.min(window.devicePixelRatio||1,2),0,0,Math.min(window.devicePixelRatio||1,2),0,0);
+    ctx.clearRect(0,0,W,H);
+
+    const cats = [{label:'Child',range:'0–12',lo:0,hi:12},
+                  {label:'Teenager',range:'13–19',lo:13,hi:19},
+                  {label:'Adult',range:'20–64',lo:20,hi:64},
+                  {label:'Senior',range:'65+',lo:65,hi:200}];
+    const bw = (W-20)/4;
+    let active='';
+    cats.forEach((cat,i)=>{
+      const hit = age>=cat.lo && age<=cat.hi;
+      if(hit) active=cat.label;
+      const x = 10 + i*bw;
+      ctx.fillStyle = hit ? 'rgba(98,232,138,.2)' : 'rgba(14,23,41,.5)';
+      ctx.strokeStyle = hit ? '#62e88a' : '#1f2d4d';
+      ctx.lineWidth = hit ? 2.5 : 1;
+      ctx.beginPath(); ctx.roundRect(x+4,12,bw-8,80,10); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = hit ? '#62e88a' : '#64759c';
+      ctx.font = `bold 13px monospace`; ctx.textAlign='center';
+      ctx.fillText(cat.label, x+bw/2, 52);
+      ctx.fillStyle = '#64759c'; ctx.font='10px monospace';
+      ctx.fillText(cat.range, x+bw/2, 72);
+      ctx.textAlign='left';
+    });
+
+    // age marker
+    const frac = Math.min(age/90, 1);
+    const mx = 14 + frac*(W-28);
+    ctx.fillStyle='#ffcb6b';
+    ctx.beginPath(); ctx.arc(mx, 96, 6, 0, 7); ctx.fill();
+
+    out.innerHTML =
+      `age = <span class="hl">${age}</span>
+
+if age <= 12:    →  ${age<=12?'<span class="g">True ✓</span>':'False'}
+elif age <= 19:  →  ${age>12&&age<=19?'<span class="g">True ✓</span>':age<=12?'(skipped)':'False'}
+elif age <= 64:  →  ${age>19&&age<=64?'<span class="g">True ✓</span>':age<=19?'(skipped)':'False'}
+else:            →  ${age>64?'<span class="g">True ✓</span>':'(skipped)'}
+
+Category: <span class="g">${active}</span>`;
+  }
+
+  $('#ifAge').addEventListener('input', draw);
+  window.addEventListener('resize', draw);
+  draw();
+});
+
+/* ══════════════════════════════════════════════
+   13  FOR LOOP CANVAS
+══════════════════════════════════════════════ */
+window.__demos.push(function(){
+  const c = $('#forCanvas'); if(!c) return;
+  const ctx = c.getContext('2d');
+  const out = $('#forOut'); if(!out) return;
+  const students = [{name:"Alice",score:92},{name:"Bob",score:75},{name:"Charlie",score:88},{name:"David",score:55}];
+  let idx = -1;
+
+  function grade(s){ return s>=90?'A':s>=80?'B':s>=70?'C':s>=60?'D':'F'; }
+  function gradeCol(g){ return g==='A'?'#62e88a':g==='B'?'#38f0d8':g==='C'?'#ffcb6b':g==='D'?'#ff6ec7':'#ff6b81'; }
+
+  function draw(){
+    const W = c.clientWidth||600, H = 160;
+    c.width = Math.round(W*(Math.min(window.devicePixelRatio||1,2)));
+    c.height = Math.round(H*(Math.min(window.devicePixelRatio||1,2)));
+    ctx.setTransform(Math.min(window.devicePixelRatio||1,2),0,0,Math.min(window.devicePixelRatio||1,2),0,0);
+    ctx.clearRect(0,0,W,H);
+
+    const bw = (W-20)/students.length;
+    students.forEach((s,i)=>{
+      const active = i===idx;
+      const done = i<idx;
+      const x=10+i*bw;
+      const g=grade(s.score);
+      ctx.fillStyle = active?'rgba(56,240,216,.15)':done?'rgba(98,232,138,.08)':'rgba(14,23,41,.5)';
+      ctx.strokeStyle = active?'#38f0d8':done?'#62e88a':'#1f2d4d';
+      ctx.lineWidth = active?2.5:1;
+      ctx.beginPath(); ctx.roundRect(x+4,8,bw-8,120,10); ctx.fill(); ctx.stroke();
+      ctx.fillStyle=active?'#e7edf9':done?gradeCol(g):'#64759c';
+      ctx.font='bold 12px monospace'; ctx.textAlign='center';
+      ctx.fillText(s.name,x+bw/2,42);
+      ctx.fillText(s.score,x+bw/2,68);
+      if(done||active){
+        ctx.fillStyle=gradeCol(g); ctx.font='bold 22px monospace';
+        ctx.fillText(g,x+bw/2,108);
+      }
+      ctx.textAlign='left';
+    });
+
+    // conveyor belt line
+    ctx.strokeStyle='#1f2d4d'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(10,136); ctx.lineTo(W-10,136); ctx.stroke();
+    if(idx>=0){
+      const ax=14+(idx*(bw))+bw/2;
+      ctx.fillStyle='#ffcb6b';
+      ctx.beginPath(); ctx.moveTo(ax,130); ctx.lineTo(ax-6,142); ctx.lineTo(ax+6,142); ctx.closePath(); ctx.fill();
+    }
+
+    if(idx<0){
+      out.innerHTML=`for name, score in scores.items():\n    # press Next to start the loop`;
+    } else {
+      const s=students[idx];
+      const g=grade(s.score);
+      out.innerHTML=`Iteration ${idx+1}/4:\n  name = <span class="hl">"${s.name}"</span>,  score = <span class="hl">${s.score}</span>\n  grade = <span class="g">"${g}"</span>  (score ${s.score>=90?'≥90':s.score>=80?'≥80':s.score>=70?'≥70':s.score>=60?'≥60':'<60'})\n  print("${s.name}: ${s.score} → ${g}")`;
+    }
+  }
+
+  $('#forNext').addEventListener('click',()=>{ if(idx<students.length-1){idx++;draw();} });
+  $('#forReset').addEventListener('click',()=>{ idx=-1; draw(); });
+  window.addEventListener('resize',draw);
+  draw();
+});
+
+/* ══════════════════════════════════════════════
+   14  WHILE LOOP CANVAS
+══════════════════════════════════════════════ */
+window.__demos.push(function(){
+  const c = $('#whileCanvas'); if(!c) return;
+  const ctx = c.getContext('2d');
+  const out = $('#whileOut'); if(!out) return;
+  let nums=[], total=0;
+
+  function draw(){
+    const W=c.clientWidth||600, H=140;
+    c.width=Math.round(W*(Math.min(window.devicePixelRatio||1,2)));
+    c.height=Math.round(H*(Math.min(window.devicePixelRatio||1,2)));
+    ctx.setTransform(Math.min(window.devicePixelRatio||1,2),0,0,Math.min(window.devicePixelRatio||1,2),0,0);
+    ctx.clearRect(0,0,W,H);
+
+    // bar chart
+    const maxVal=120, bw=Math.min(36,(W-60)/Math.max(nums.length,1));
+    const padL=30, padB=40;
+    nums.forEach((n,i)=>{
+      const barH=Math.max(4, (n/maxVal)*(H-padB-10));
+      const x=padL+i*(bw+4);
+      const stopped=total>100&&i===nums.length-1;
+      ctx.fillStyle=stopped?'#ff6b81':'#38f0d8';
+      ctx.fillRect(x,H-padB-barH,bw,barH);
+      ctx.fillStyle='#64759c'; ctx.font='10px monospace'; ctx.textAlign='center';
+      ctx.fillText(n,x+bw/2,H-padB-barH-4);
+      ctx.textAlign='left';
+    });
+
+    // total line at 100
+    const y100=H-padB-(100/maxVal)*(H-padB-10);
+    ctx.strokeStyle='#ffcb6b'; ctx.lineWidth=1.5; ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(padL,y100); ctx.lineTo(W-10,y100); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='#ffcb6b'; ctx.font='10px monospace';
+    ctx.fillText('100',4,y100+4);
+
+    const stopped=total>100;
+    out.innerHTML=
+      `numbers = <span class="hl">[${nums.join(', ')}]</span>
+total   = <span class="${stopped?'er':'hl'}">${total}</span>
+
+while total <= 100:   →  ${!stopped?'<span class="g">True — keep adding</span>':'<span class="er">False — loop stops!</span>'}
+${stopped?'\nLoop ended because total ('+total+') > 100\nprint("Numbers:", '+JSON.stringify(nums)+')\nprint("Total:", <span class="g">'+total+'</span>)':'Press "+ Add random number" to continue...'}`;
+  }
+
+  $('#whileAdd').addEventListener('click',()=>{
+    if(total>100) return;
+    const n=Math.floor(Math.random()*25)+5;
+    nums.push(n); total+=n;
+    draw();
+  });
+  $('#whileReset').addEventListener('click',()=>{ nums=[]; total=0; draw(); });
+  window.addEventListener('resize',draw);
+  draw();
+});
+
+/* ══════════════════════════════════════════════
+   15  FUNCTIONS EXPLORER
+══════════════════════════════════════════════ */
+window.__demos.push(function(){
+  const out = $('#fnOut'); if(!out) return;
+  const ctrl = $('#fnControls'); if(!ctrl) return;
+  let curFn = 'avg';
+
+  const fnDefs = {
+    avg:{
+      label:'calculate_average(numbers)',
+      controls:`<div class="ctrl"><label>Grades (comma-sep)</label><input id="fnGrades" type="text" value="85,90,78,92" style="background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 10px;color:var(--ink);font-family:var(--mono);font-size:.8rem;flex:1;outline:none;"></div>`,
+      compute:()=>{
+        const raw=$('#fnGrades')?$('#fnGrades').value:'85,90,78,92';
+        const nums=raw.split(',').map(Number).filter(n=>!isNaN(n));
+        const total=nums.reduce((a,v)=>a+v,0);
+        const avg=total/nums.length;
+        return `def calculate_average(numbers):
+    total = sum(numbers)  →  <span class="hl">${total}</span>
+    count = len(numbers)  →  <span class="hl">${nums.length}</span>
+    return total / count
+
+calculate_average([${nums.join(', ')}])
+  →  <span class="g">${fmt(avg,2)}</span>`;
+      }
+    },
+    mul:{
+      label:'multiply_list(numbers, multiplier)',
+      controls:`<div class="ctrl"><label>Prices</label><input id="fnPrices" type="text" value="100,250,80" style="background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 10px;color:var(--ink);font-family:var(--mono);font-size:.8rem;flex:1;outline:none;"></div><div class="ctrl"><label>Multiplier</label><input type="range" id="fnMul" min="1.0" max="3.0" step="0.1" value="1.2"><span class="val" id="fnMulV">1.2</span></div>`,
+      compute:()=>{
+        const raw=$('#fnPrices')?$('#fnPrices').value:'100,250,80';
+        const m=parseFloat($('#fnMul')?$('#fnMul').value:1.2);
+        $('#fnMulV')&&($('#fnMulV').textContent=fmt(m,1));
+        const nums=raw.split(',').map(Number).filter(n=>!isNaN(n));
+        const result=nums.map(n=>fmt(n*m,2));
+        return `def multiply_list(numbers, multiplier):
+    return [n * multiplier for n in numbers]
+
+multiply_list([${nums.join(', ')}], ${fmt(m,1)})
+  →  <span class="g">[${result.join(', ')}]</span>  (prices + ${Math.round((m-1)*100)}% tax)`;
+      }
+    },
+    bmi:{
+      label:'bmi_category(bmi)',
+      controls:`<div class="ctrl"><label>BMI value</label><input type="range" id="fnBmi" min="10" max="45" step="0.5" value="22.5"><span class="val" id="fnBmiV">22.5</span></div>`,
+      compute:()=>{
+        const bmi=parseFloat($('#fnBmi')?$('#fnBmi').value:22.5);
+        $('#fnBmiV')&&($('#fnBmiV').textContent=fmt(bmi,1));
+        let cat;
+        if(bmi<18.5) cat='Underweight';
+        else if(bmi<25) cat='Normal weight';
+        else if(bmi<30) cat='Overweight';
+        else cat='Obese';
+        return `def bmi_category(bmi):
+    if bmi < 18.5:   return "Underweight"
+    elif bmi < 25:   return "Normal weight"
+    elif bmi < 30:   return "Overweight"
+    else:            return "Obese"
+
+bmi_category(${fmt(bmi,1)})
+  →  <span class="g">"${cat}"</span>`;
+      }
+    }
+  };
+
+  function renderFn(){
+    const def=fnDefs[curFn];
+    ctrl.innerHTML=def.controls;
+    ctrl.querySelectorAll('input').forEach(el=>el.addEventListener('input',renderFn));
+    out.innerHTML=def.compute();
+  }
+
+  $$('#fnChips .btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      $$('#fnChips .btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      curFn=btn.dataset.fn;
+      renderFn();
+    });
+  });
+  renderFn();
+});
+
+/* FUNCTION STEP THROUGH */
+window.__demos.push(function(){
+  const out = $('#fnStepOut'); if(!out) return;
+  const nums=[85,90,78,92];
+  const total=nums.reduce((a,v)=>a+v,0);
+  const avg=total/nums.length;
+  const steps=[
+    `Call: calculate_average([${nums.join(', ')}])`,
+    `Step 1 — bind the parameter:\n  numbers = <span class="hl">[${nums.join(', ')}]</span>`,
+    `Step 2 — compute total:\n  total = sum(numbers) = ${nums.join(' + ')} = <span class="hl">${total}</span>`,
+    `Step 3 — compute count:\n  count = len(numbers) = <span class="hl">${nums.length}</span>`,
+    `Step 4 — return the result:\n  return total / count = ${total} / ${nums.length} = <span class="g">${fmt(avg,2)}</span>`,
+    `Back in the caller:\n  avg = <span class="g">${fmt(avg,2)}</span>\n  print(f"Average: {avg:.2f}")  →  Average: <span class="g">${fmt(avg,2)}</span>`
+  ];
+  let i=0;
+  function render(){ let s=''; for(let k=0;k<=i;k++) s+=(k?'\n\n':'')+steps[k]; out.innerHTML=s; }
+  render();
+  $('#fnNext').addEventListener('click',()=>{ if(i<steps.length-1){i++;render();} });
+  $('#fnReset').addEventListener('click',()=>{ i=0; render(); });
+});
+
+/* ══════════════════════════════════════════════
+   16  FILE HANDLING STEP THROUGH
+══════════════════════════════════════════════ */
+window.__demos.push(function(){
+  const out = $('#fileOut'); if(!out) return;
+  const lines=[
+    ['Alice','A'],['Bob','B+'],['Charlie','A-']
+  ];
+  const steps=[
+    `# Step 1 — Open the file for writing\nwith open(<span class="hl">"grades.txt"</span>, <span class="hl">"w"</span>) as f:\n    # mode "w" creates the file if it doesn't exist\n    # and clears it if it does`,
+    `# Step 2 — Write first record\n    f.write(<span class="hl">"Alice,A\\n"</span>)\n    → grades.txt now contains:\n    <span class="g">Alice,A</span>`,
+    `# Step 3 — Write second record\n    f.write(<span class="hl">"Bob,B+\\n"</span>)\n    → grades.txt now contains:\n    <span class="g">Alice,A\nBob,B+</span>`,
+    `# Step 4 — Write third record\n    f.write(<span class="hl">"Charlie,A-\\n"</span>)\n    → grades.txt now contains:\n    <span class="g">Alice,A\nBob,B+\nCharlie,A-</span>`,
+    `# Step 5 — File closes automatically when 'with' block ends\n# Now open for reading\nwith open(<span class="hl">"grades.txt"</span>, <span class="hl">"r"</span>) as f:`,
+    `# Step 6 — Loop through each line\n    for line in f:\n        name, grade = line.<span class="hl">strip()</span>.split(<span class="hl">","</span>)\n        # strip() removes the \\n at the end\n        # split(",") splits "Alice,A" into ["Alice","A"]\n        print(f"{name} got {grade}")\n\nOutput:\n<span class="g">Alice got A\nBob got B+\nCharlie got A-</span>`
+  ];
+  let i=0;
+  function render(){ let s=''; for(let k=0;k<=i;k++) s+=(k?'\n\n':'')+steps[k]; out.innerHTML=s; }
+  render();
+  $('#fileNext').addEventListener('click',()=>{ if(i<steps.length-1){i++;render();} });
+  $('#fileReset').addEventListener('click',()=>{ i=0; render(); });
+});
+
+/* ══════════════════════════════════════════════
+   ACTIVE RECALL BUTTONS
+══════════════════════════════════════════════ */
+window.__demos.push(function(){
+  [['recallBtn1','recallAns1'],['recallBtn2','recallAns2']].forEach(([btnId,ansId])=>{
+    const btn=$('#'+btnId); const ans=$('#'+ansId); if(!btn||!ans) return;
+    btn.addEventListener('click',()=>{
+      if(ans.style.display==='none'||!ans.style.display){
+        ans.style.display='block'; btn.textContent='Hide answer';
+      } else {
+        ans.style.display='none'; btn.textContent='Reveal answer';
+      }
+    });
+  });
+});
+
+/* ══════════════════════════════════════════════
+   SCROLL SPY + PROGRESS
+══════════════════════════════════════════════ */
+const tocLinks = $$('#toc a');
+const sections  = tocLinks.map(a=>$(a.getAttribute('href')));
+function onScroll(){
+  const st=window.scrollY, h=document.body.scrollHeight-window.innerHeight;
+  if(h>0) $('#progbar').style.width=(100*st/h)+'%';
+  let idx=0;
+  sections.forEach((sec,i)=>{ if(sec && sec.offsetTop-160<=st) idx=i; });
+  tocLinks.forEach((a,i)=>a.classList.toggle('active',i===idx));
+}
+window.addEventListener('scroll',onScroll,{passive:true});
+
+/* ══════════════════════════════════════════════
+   THEME TOGGLE
+══════════════════════════════════════════════ */
+function initTheme(){
+  const btn=$('#themeBtn');
+  function apply(){
+    const light=document.documentElement.getAttribute('data-theme')==='light';
+    btn.textContent=light?'🌙 Dark':'☀ Light';
+  }
+  btn.addEventListener('click',()=>{
+    const light=document.documentElement.getAttribute('data-theme')==='light';
+    document.documentElement.setAttribute('data-theme',light?'dark':'light');
+    try{localStorage.setItem('lecTheme',light?'dark':'light');}catch(e){}
+    apply();
+  });
+  apply();
+}
+
+/* ══════════════════════════════════════════════
+   GUIDED TOUR
+══════════════════════════════════════════════ */
+const STORY=[
+  {id:'intro',t:'Welcome',x:'This lecture covers every Python building block from variables to file handling. Use ▶/◀ or arrow keys; space pauses.'},
+  {id:'what-is-python',t:'What is Python?',x:'Python is interpreted, high-level, and object-oriented. Explore the table to see why these features matter for data science.'},
+  {id:'compilers',t:'Compilers vs Interpreters',x:'Click "Compiled language" then "Python (interpreted)" to see how many steps each approach needs. Python wins on simplicity.'},
+  {id:'ides',t:'IDEs & Jupyter',x:'Type a Python expression in the cell simulator and press Run. This is exactly how a real Jupyter cell works.'},
+  {id:'variables',t:'Variables',x:'Drag the quarterly profit sliders. Watch the variable names bind to new values in the readout — that is assignment.'},
+  {id:'datatypes',t:'Data Types',x:'Click each value button. Notice how the same-looking number "42" means something completely different as int vs float vs string.'},
+  {id:'operators',t:'Operators',x:'Set A=17 and B=5. Try // and % together — floor division gives the quotient (3), modulo gives the remainder (2). They are partners.'},
+  {id:'input-output',t:'Input & Output',x:'Slide height and weight in the BMI calculator. The readout shows the exact code Python would run — including the type conversion.'},
+  {id:'strings',t:'Strings & Slicing',x:'Set start=0, stop=6, step=2 and watch every other character highlight. Negative steps reverse the string — try start=12, stop=0, step=-1.'},
+  {id:'lists',t:'Lists',x:'Click append, sort, then reverse. Each operation transforms the list in-place. Notice how the length updates with every change.'},
+  {id:'tuples',t:'Tuples',x:'Click "Change list[1]" — it works. Then click "Change tuple[1]" — it crashes. That one TypeError is the whole point of tuples.'},
+  {id:'sets',t:'Sets',x:'Toggle Bob and David off Workshop 1. The intersection shrinks. Toggle them back. Sets make membership logic trivial.'},
+  {id:'dicts',t:'Dictionaries',x:'Change the name and slide the grades. The dictionary updates with every keystroke and recalculates the average automatically.'},
+  {id:'if-else',t:'if / elif / else',x:'Drag the age slider slowly from 0 to 90. Watch exactly which branch Python enters at each threshold — that is conditional logic made visible.'},
+  {id:'for-loop',t:'for Loops',x:'Press Next Iteration four times. Each press advances the conveyor belt one item and shows the grade computed for that student.'},
+  {id:'while-loop',t:'while Loops',x:'Add numbers one by one. The bar crosses 100 and the loop condition flips to False — the exact moment Python would stop.'},
+  {id:'functions',t:'Functions',x:'Switch between the three functions and adjust inputs. Watch parameters flow in and return values flow out — the function is a black box with a contract.'},
+  {id:'file-handling',t:'File Handling',x:'Step through all 6 phases: open, write three records, close, re-open, read. Step 6 shows why .strip() matters.'},
+  {id:'wrapup',t:'All done!',x:'You have seen every building block. Check yourself with the two recall questions — answer from memory before revealing.'},
+];
+
+let stIdx=0, stTimer=null, stPlaying=true;
+
+function startStory(){
+  $('#storycard').style.display='block';
+  stIdx=0; stPlaying=true;
+  showStory();
+  stTimer=setInterval(()=>{ if(stPlaying) nextStory(); }, 6000);
+}
+function endStory(){
+  $('#storycard').style.display='none';
+  $('#spotRing').style.display='none';
+  clearInterval(stTimer);
+}
+function showStory(){
+  const s=STORY[stIdx];
+  $('#stTitle').textContent=s.t;
+  $('#stText').textContent=s.x;
+  const sec=$(('#'+s.id));
+  if(sec){
+    sec.scrollIntoView({behavior:'smooth',block:'center'});
+    setTimeout(()=>{
+      const r=sec.getBoundingClientRect();
+      const ring=$('#spotRing');
+      ring.style.display='block';
+      ring.style.left=(r.left-8)+'px'; ring.style.top=(r.top+window.scrollY-8)+'px';
+      ring.style.width=(r.width+16)+'px'; ring.style.height=Math.min(r.height,300)+'px';
+    },400);
+  }
+  $('#stPlay').textContent=stPlaying?'⏸ Pause':'▶ Play';
+}
+function nextStory(){ if(stIdx<STORY.length-1){stIdx++;showStory();} else endStory(); }
+function prevStory(){ if(stIdx>0){stIdx--;showStory();} }
+
+function initStory(){
+  $('#tourBtn').addEventListener('click',startStory);
+  $('#stNext').addEventListener('click',()=>{ clearInterval(stTimer); nextStory(); if(stPlaying) stTimer=setInterval(()=>{if(stPlaying)nextStory();},6000); });
+  $('#stPrev').addEventListener('click',()=>{ clearInterval(stTimer); prevStory(); if(stPlaying) stTimer=setInterval(()=>{if(stPlaying)nextStory();},6000); });
+  $('#stPlay').addEventListener('click',()=>{ stPlaying=!stPlaying; $('#stPlay').textContent=stPlaying?'⏸ Pause':'▶ Play'; });
+  $('#stExit').addEventListener('click',endStory);
+  document.addEventListener('keydown',e=>{
+    if($('#storycard').style.display==='block'){
+      if(e.key==='ArrowRight') $('#stNext').click();
+      else if(e.key==='ArrowLeft') $('#stPrev').click();
+      else if(e.key===' '){ e.preventDefault(); $('#stPlay').click(); }
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════
+   SCROLL REVEAL (skip canvas-containing elements)
+══════════════════════════════════════════════ */
+function initReveal(){
+  const obs=new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
+  },{threshold:.12});
+  $$('.reveal').forEach(el=>obs.observe(el));
+}
+
+/* ══════════════════════════════════════════════
+   BOOT
+══════════════════════════════════════════════ */
+window.addEventListener('load',()=>{
+  runDemos();
+  initTheme();
+  initReveal();
+  initStory();
+  initCopyBtns();
+  onScroll();
+  if(window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise();
+});
+</script>
+</body>
+</html>
