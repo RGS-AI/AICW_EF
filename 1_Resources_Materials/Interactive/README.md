@@ -12,7 +12,7 @@ Simply click on any topic below to launch the interactive resource in your brows
 
 | Topic | Description | Access |
 |-------|-------------|--------|
-| 🐍 Python Programming | Python fundamentals, syntax, data structures, functions, modules, and more. | **[Launch Python Companion](will be added shortly)** |
+| 🐍 Python Programming | Python fundamentals, syntax, data structures, functions, modules, and more. | **[Launch Python Companion]((https://pythonbasic.vercel.app))** |
 | 🏗️ Object-Oriented Programming (OOP) | Classes, Objects, Inheritance, Polymorphism, Encapsulation, Abstraction, and Design Principles. | **[Launch OOP Companion](will be added shortly)** |
 | 📊 Data Analytics | Data preprocessing, visualization, statistics, and analytical workflows. | **[Launch Data Analytics Companion](will be added shortly)** |
 | 🤖 Machine Learning | Supervised & Unsupervised Learning, Model Evaluation, Feature Engineering, and Algorithms. | **[Launch Machine Learning Companion](will be added shortly)** |
