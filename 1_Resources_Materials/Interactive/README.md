@@ -12,14 +12,14 @@ Simply click on any topic below to launch the interactive resource in your brows
 
 | Topic | Description | Access |
 |-------|-------------|--------|
-| 🐍 Python Programming | Python fundamentals, syntax, data structures, functions, modules, and more. | **[Launch Python Companion](https://pythonbasic.vercel.app)** |
-| 🏗️ Object-Oriented Programming (OOP) | Classes, Objects, Inheritance, Polymorphism, Encapsulation, Abstraction, and Design Principles. | **[Launch OOP Companion](will be added shortly)** |
-| 📊 Data Analytics | Data preprocessing, visualization, statistics, and analytical workflows. | **[Launch Data Analytics Companion](will be added shortly)** |
-| 🤖 Machine Learning | Supervised & Unsupervised Learning, Model Evaluation, Feature Engineering, and Algorithms. | **[Launch Machine Learning Companion](will be added shortly)** |
-| 🧠 Deep Learning | Neural Networks, CNNs, RNNs, Transformers, Optimization, and Modern Architectures. | **[Launch Deep Learning Companion](will be added shortly)** |
-| 💬 Natural Language Processing (NLP) | Text Processing, Embeddings, Transformers, LLM Fundamentals, and Applications. | **[Launch NLP Companion](will be added shortly)** |
-| 👁️ Computer Vision (CV) | Image Processing, CNNs, Object Detection, Segmentation, and Vision Models. | **[Launch Computer Vision Companion](will be added shortly)** |
-| ✨ Generative AI | Prompt Engineering, Large Language Models, Diffusion Models, RAG, AI Agents, and Applications. | **[Launch GenAI Companion](will be added shortly)** |
+| 🐍 Python Programming | Python fundamentals, syntax, data structures, functions, modules, and more. | **[Launch Python Interactive](https://pythonbasic.vercel.app)** |
+| 🏗️ Object-Oriented Programming (OOP) | Classes, Objects, Inheritance, Polymorphism, Encapsulation, Abstraction, and Design Principles. | **[Launch OOP Interactive](will be added shortly)** |
+| 📊 Data Analytics | Data preprocessing, visualization, statistics, and analytical workflows. | **[Launch Data Analytics Interactive](will be added shortly)** |
+| 🤖 Machine Learning | Supervised & Unsupervised Learning, Model Evaluation, Feature Engineering, and Algorithms. | **[Launch Machine Learning Interactive](will be added shortly)** |
+| 🧠 Deep Learning | Neural Networks, CNNs, RNNs, Transformers, Optimization, and Modern Architectures. | **[Launch Deep Learning Interactive](will be added shortly)** |
+| 💬 Natural Language Processing (NLP) | Text Processing, Embeddings, Transformers, LLM Fundamentals, and Applications. | **[Launch NLP Interactive](will be added shortly)** |
+| 👁️ Computer Vision (CV) | Image Processing, CNNs, Object Detection, Segmentation, and Vision Models. | **[Launch Computer Vision Interactive](will be added shortly)** |
+| ✨ Generative AI | Prompt Engineering, Large Language Models, Diffusion Models, RAG, AI Agents, and Applications. | **[Launch GenAI Interactive](will be added shortly)** |
 
 ---
 
