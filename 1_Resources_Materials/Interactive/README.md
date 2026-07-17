@@ -13,7 +13,7 @@ Simply click on any topic below to launch the interactive resource in your brows
 | Topic | Description | Access |
 |-------|-------------|--------|
 | 🐍 Python Programming | Python fundamentals, syntax, data structures, functions, modules, and more. | **[Launch Python Interactive](https://pythonbasic.vercel.app)** |
-| 🏗️ Object-Oriented Programming (OOP) | Classes, Objects, Inheritance, Polymorphism, Encapsulation, Abstraction, and Design Principles. | **[Launch OOP Interactive](will be added shortly)** |
+| 🏗️ Object-Oriented Programming (OOP) | Classes, Objects, Inheritance, Polymorphism, Encapsulation, Abstraction, and Design Principles. | **[Launch OOP Interactive](https://oop3-kappa.vercel.app)** |
 | 📊 Data Analytics | Data preprocessing, visualization, statistics, and analytical workflows. | **[Launch Data Analytics Interactive](will be added shortly)** |
 | 🤖 Machine Learning | Supervised & Unsupervised Learning, Model Evaluation, Feature Engineering, and Algorithms. | **[Launch Machine Learning Interactive](will be added shortly)** |
 | 🧠 Deep Learning | Neural Networks, CNNs, RNNs, Transformers, Optimization, and Modern Architectures. | **[Launch Deep Learning Interactive](will be added shortly)** |
